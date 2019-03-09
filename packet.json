@@ -1,0 +1,20 @@
+{
+	"name" : "Zexarel",
+	"version" : "1.0.0",
+	"require" : {
+		"function" : {
+			"find" : "find.php",
+			"get_string_between" : "get_string_between.php",
+			"redirect" : "redirect.php",
+			"d_var_dump" : "d_var_dump.php"
+		},
+		"class" : {
+			"ZConfig" : "ZConfig.php",
+			"ZDatabase" : "ZDatabase",
+			"ZRoute" : "ZRoute"
+			
+			
+		}
+	}
+	
+}
