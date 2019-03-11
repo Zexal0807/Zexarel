@@ -9,12 +9,23 @@
 			"d_var_dump" : "d_var_dump.php"
 		},
 		"class" : {
-			"ZConfig" : "ZConfig.php",
-			"ZDatabase" : "ZDatabase",
-			"ZRoute" : "ZRoute"
-			
-			
+			"ZConfig" : {
+				"ZConfig" : "ZConfig.php"
+			},
+			"ZDatabase" : {
+				"ZDatabase" : "ZDatabase.php"
+			},
+			"ZRoute" : {
+				"Request" : "Request.php",
+				"Route" : "Route.php",
+				"ZRoute" : "ZRoute.php"
+			},
+			"ZView" : {
+				"ZView" : "ZView.php"
+			},
+			"ZModel" : {
+				"ZModel" : "ZModel.php"
+			}
 		}
 	}
-	
 }
