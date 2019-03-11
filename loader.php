@@ -8,39 +8,33 @@ if(sizeof($bt) > 0){
 		$dir = dirname(find_relative_path($bt, __FILE__));
 	}else{
 		$dir = dirname(__FILE__);
-	}	
+	}
 }else{
 	$dir = dirname(__FILE__);
 }
-//$dir = $dir . DIRECTORY_SEPARATOR;
-$c = file_get_contents($dir. DIRECTORY_SEPARATOR . "packet.json");
+$c = file_get_contents($dir.DIRECTORY_SEPARATOR."packet.json");
 $c = json_decode($c, true);
 if(isset($c['require'])){
-	//$dir = $dir . "zexarel";
 	Zrequire($dir, $c['require']);
 }
-d_var_dump(get_included_files());
-
 function Zrequire($dir = "", $a){
 	foreach($a as $k => $v){
 		if(is_array($v)){
-			Zrequire($dir. DIRECTORY_SEPARATOR . $k, $v);
+			Zrequire($dir.DIRECTORY_SEPARATOR.$k, $v);
 		}else{
-			require_once($dir."/".$v);
+			require_once($dir.DIRECTORY_SEPARATOR.$v);
 		}
 	}
-	
 }
 
 function find_relative_path($frompath, $topath ){
 	$from = explode(DIRECTORY_SEPARATOR, $frompath); // Folders/File
 	$to = explode(DIRECTORY_SEPARATOR, $topath); // Folders/File
 	$relpath = '';
-
 	$i = 0;
 	// Find how far the path is the same
 	while(isset($from[$i]) && isset($to[$i])){
-		if($from[$i] != $to[$i]) 
+		if($from[$i] != $to[$i])
 			break;
 		$i++;
 	}
