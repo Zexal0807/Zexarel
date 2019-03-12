@@ -37,7 +37,7 @@ function _v($arr, $p){
 		case "string":
 			echo '<span style="color:'.STRING_COLOR.'">';
 			echo "String(".strlen($arr).")</span>";
-			echo ' "'.$arr.'"';
+			echo ' "'.str_replace(["<", ">"], ["&lt;", "&gt;"], $arr).'"';
 			break;
 		case "array":
 			echo "Array(".sizeof($arr).") {\r\n";
@@ -55,17 +55,17 @@ function _v($arr, $p){
 		case "object":
 			$class = get_class($arr);
 			$super = get_parent_class($arr);
-			
+
 			echo '<span style="color:'.OBJECT_COLOR.'">';
 			echo "Object";
 			echo "</span>(".$class.($super != false ? " extends ".$super : "")."){\r\n";
-			
+
 			$o = (array)$arr;
-			
+
 			foreach($o as $k => $v){
 				$type = "";
 				$name = "";
-				
+
 				if(substr($k, 1, 1) == "*"){
 					$type = "protected";
 					$name = substr($k, 2);
