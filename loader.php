@@ -1,5 +1,4 @@
 <?php
-require 'function/d_var_dump.php';
 $bt = debug_backtrace();
 $dir = "";
 if(sizeof($bt) > 0){
