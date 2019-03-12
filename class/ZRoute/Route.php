@@ -44,16 +44,24 @@ class Route{
 	}
 	public function compareRequestAndRun(Request $req){
 		if($req->getMethod() == $this->method){
-			$routeUrl = preg_replace('/{{+[a-zA-Z0-9-]*+}}/', '[a-zA-Z0-9-]*', $this->url);
-			if(preg_match("#^".$routeUrl."$#", $req->getUrl())){
 				$arr = $req->getParameters();
-				array_merge($arr, $req->getCookies(), $req->getFiles());
+				if(preg_match("#^".$this->pattern."$#", $req->getUrl())){
+				$arr["_COOKIE"] = $req->getCookies();
+				$arr["_FILES"] = $req->getFiles();
 				if($this->url != $req->getUrl()){
 					$f = explode("/", $this->url);
 					$r = explode("/", $req->getUrl());
-					for($i = 0; $i < sizeof($f); $i++){
-						if(preg_match('/{{+[a-zA-Z0-9-]*+}}/', $f[$i])){
-							$arr[str_replace(["{", "}", '"', "[", "]"], "", $f[$i])] = $r[$i];
+					for($i = 0, $k = 0; $i < sizeof($r); $i++, $k++){
+						if($r[$i] == $f[$k]){
+						}else{
+							if(preg_match('/\[+[a-zA-Z0-9]*+\]/', $f[$k])){
+								$e = str_replace(["[", "]"], "", $r[$i]);
+								$arr[str_replace(["[", "]"], "", $f[$k])] = ($e == $f[$k]);
+								$i--;
+							}elseif(preg_match('/\<+[a-zA-Z0-9]*+\>/', $f[$k])){
+								$e = str_replace(["<", ">"], "", $r[$i]);
+								$arr[$f[$k]] = $e;
+							}
 						}
 					}
 				}
