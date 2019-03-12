@@ -20,6 +20,14 @@ class ZRoute{
 		return "";
 	}
 
+	public static function getRoute($name){
+		foreach(ZRoute::$_route as $r){
+			if($r->getName() == $name){
+				return $r;
+			}
+		}
+	}
+
 	public static function listen(){
 		/*
 		Metodo listen
