@@ -6,7 +6,7 @@ class Request{
 	private $cookie;
 	private $files;
 	public function __construct(){
-		$this->url = isset($_REQUEST['uri']) ? trim($_REQUEST['uri'], '/\^$') : '';
+		$this->url = trim($_SERVER['REQUEST_URI'], '/\^$');
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		switch($this->method){
 			case "PUT":
@@ -20,7 +20,6 @@ class Request{
 				$this->parameter = $_GET;
 				break;
 			case "POST":
-				var_dump($_POST);
 				if(array_key_exists('_method', $_POST) || array_key_exists('_METHOD', $_POST)){
 					$this->method = strtoupper(isset($_POST['_method']) ? $_POST['_method'] : $_POST['_METHOD']);
 					parse_str(file_get_contents("php://input"), ${"_".$this->method});
@@ -58,11 +57,9 @@ class Request{
 		}
 		return "";
 	}
-
 	public function getFiles(){
 		return $this->files;
 	}
-
 	public function getFile($name){
 		if(array_key_exists($name, $this->files)){
 			return $this->files[$name];
