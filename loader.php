@@ -11,7 +11,7 @@ if(sizeof($bt) > 0){
 }else{
 	$dir = dirname(__FILE__);
 }
-$c = file_get_contents($dir.DIRECTORY_SEPARATOR."packet.json");
+$c = file_get_contents($dir.DIRECTORY_SEPARATOR."package.json");
 $c = json_decode($c, true);
 if(isset($c['require'])){
 	Zrequire($dir, $c['require']);
