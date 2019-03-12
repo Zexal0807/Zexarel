@@ -3,6 +3,7 @@ class Route{
 	private $method;
 	private $url;
 	private $pattern;
+	private $parameter;
 	private $callback;
 	private $name;
 	public function __construct($method, $url, $callback, $name = null){
@@ -18,6 +19,7 @@ class Route{
 				}
 				$f = true;
 				$this->pattern .= '+[a-zA-Z0-9]*';
+				$this->parameter[] = $p[$i];
 			}elseif(preg_match('/\\[+[a-zA-Z0-9]*+\]/', $p[$i])){
 				$this->pattern .= "+(\/+".str_replace(["[", "]"], "", $p[$i]).')?';
 			}else{
