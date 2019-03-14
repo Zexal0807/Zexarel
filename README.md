@@ -80,7 +80,7 @@ public function insert($table, ... $field_list)
 public function value(... $value_list)
 public function update($table)
 public function set($field, $value)
-public function getSQL() : string   //return the SQL string
-public function execute() : void    //execute
+public function getSQL() : string         //return the SQL string
+public function execute() : void          //execute
 public function executeSql($sql) : void   //execute a specific SQL
 ```
