@@ -20,5 +20,8 @@ function get_string_between(string $str, string $from, string $to) : string
 ```
 This function return the string between two selected string
 ## redirect
-
+```php
+function redirect(string $location) : void
+```
+Return a HTTP header that redirect to the location
 ## d_var_dump
