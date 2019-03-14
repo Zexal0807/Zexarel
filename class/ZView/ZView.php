@@ -1,9 +1,7 @@
 <?php
 class ZView{
-
 	protected static $dir = 'view/';		//string, directory della vista
 	protected static $app = "app.html";		//string, nome del file contenente l'app
-
 	public static function getView($content, $base = null, $data = null){
 		/*
 		Metodo getView

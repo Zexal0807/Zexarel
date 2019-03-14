@@ -1,32 +1,25 @@
 <?php
 class ZDatabase{
-
-    protected $user;			//string, username del database
-    protected $password;		//string, password del database
+  protected $user;			//string, username del database
+  protected $password;	//string, password del database
 	protected $host;			//string, host del database
-    protected $database;		//string, nome del database
-
-	private $obj;				//oggetto mysqli
-
-	public function __construct($host = null, $user = null, $password = null, $database = null) {
+  protected $database;	//string, nome del database
+	private $obj;				  //oggetto mysqli
+	public function __construct() {
 		/*
 		Costruttore, inizializza tutti gli attributi come array vuoti (esclusi distinct che è un boolean e into che è una string)
 		*/
-		$this->host = ZConfig::config("DB_HOST", "");
-		if(isset($host)){
-			$this->host = $host;
+    if(!isset($this->host)){
+	    $this->host = ZConfig::config("DB_HOST", "");
+    }
+    if(!isset($this->user)){
+	    $this->user = ZConfig::config("DB_USER", "");
 		}
-		$this->user = ZConfig::config("DB_USER", "");
-		if(isset($user)){
-			$this->user = $user;
+    if(!isset($this->password)){
+	    $this->password = ZConfig::config("DB_PASSWORD", "");
 		}
-		$this->password = ZConfig::config("DB_PASSWORD", "");
-		if(isset($password)){
-			$this->password = $password;
-		}
-		$this->database = ZConfig::config("DB_DATABASE", "");
-		if(isset($database)){
-			$this->database = $database;
+    if(!isset($this->database)){
+	    $this->database = ZConfig::config("DB_DATABASE", "");
 		}
 		$this->select = [];
 		$this->distinct = false;
