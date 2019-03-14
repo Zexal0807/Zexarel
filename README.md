@@ -7,7 +7,12 @@ Content:
     - [get_string_between](#get_string_between)
     - [redirect](#redirect)
     - [d_var_dump](#d_var_dump)
-
+  - Class
+    - [ZConfig](#ZConfig)
+    - [ZDatabase](#ZDatabase)
+    - [ZRoute](#ZRoute)
+    - [ZView](#ZView)
+    - [ZModel](#ZModel)
 
 ## find
 ```php
