@@ -42,3 +42,45 @@ When in your application you want get a config you must call statically config m
 ```php
 ZConfig::config("APP_NAME", "Zexarel");
 ```
+## ZDatabase
+This class manages the database, to use this class you must set the connection parameter in .zenv file; you can create a new clas that extends ZDatabase and override the beforeExecute and afterExecute method:
+```php
+class My_Database extends ZDatabase{
+  protected function beforeExecute($sql){
+    //you can use a logger
+  }
+  protected function afterExecute($sql, $result, $rowAffected){
+    //you can use a logger
+  }
+}
+```
+For create a SQL you must create new object and use the method on it:
+```php
+$db = new ZDatabase();
+$ret = $db->select("*")
+  ->from("users")
+  ->where("id", "=", 1)
+  ->execute();
+  //Now $ret contains all field of table users where id = 1
+```
+Here all possible method:
+```php
+public function select(...$fields)
+public function selectAll()
+public function selectDistinct(... $fields)
+public function from($table){
+public function where($field, $operator, $compare)
+public function groupBy($field)
+public function having($field, $operator, $compare)
+public function orderBy($field)
+public function innerJoin($table, $on, $operator, $compare)
+public function leftJoin($table, $on, $operator, $compare)
+public function rightJoin($table, $on, $operator, $compare)
+public function insert($table, ... $field_list)
+public function value(... $value_list)
+public function update($table)
+public function set($field, $value)
+public function getSQL() : string   //return the SQL string
+public function execute() : void    //execute
+public function executeSql($sql) : void   //execute a specific SQL
+```
