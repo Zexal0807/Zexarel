@@ -25,3 +25,8 @@ function redirect(string $location) : void
 ```
 Return a HTTP header that redirect to the location
 ## d_var_dump
+```php
+function d_var_dump(mixed $obj, int $size = null) : void
+```
+This function print the obj content, you can choose the size (deafult 17px)
+Find more info [here](https://github.com/Zexal0807/d_var_dump).
