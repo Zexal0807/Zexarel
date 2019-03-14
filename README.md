@@ -37,8 +37,8 @@ This function print the obj content, you can choose the size (deafult 17px)
 Find more info [here](https://github.com/Zexal0807/d_var_dump).
 
 ## ZConfig
-This class manage the application config, to use this class you need have a .zenv file where config are saved.
-When in your application you want get a config you must call statically config method, passing the config's key and the optiona default value
+This class manages the application config, to use this class you need have a .zenv file where config are saved.
+When in your application you want get a config you must call statically config method, passing the config's key and the optional default value
 ```php
 ZConfig::config("APP_NAME", "Zexarel");
 ```
