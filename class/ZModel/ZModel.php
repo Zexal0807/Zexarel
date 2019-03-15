@@ -16,7 +16,16 @@ class ZModel{
 			}
 		}
 	}
-	public function get(){
+
+	public function __get($name){
+		if(array_key_exist($name, $this->property)){
+			return $this->property[$name];
+		}else {
+			return "";
+		}
+	}
+
+	public function getHtml(){
 		/*
 		Metodo get
 		non ha argomenti
