@@ -196,3 +196,12 @@ When you create a new object in constructor you pass the data, and call the meth
 $m = new Message(["sender" => "Zexal0807", "body" => "This is the body of the message"]);
 echo $m->getHtml();
 ```
+```html
+//result
+<div>
+  <font>Zexal0807</font>
+  <p>
+  This is the body of the message
+  </p>
+</div>
+```
