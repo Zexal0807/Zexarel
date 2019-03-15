@@ -104,4 +104,77 @@ ZRoute::getUri("home");
 ```
 
 ## ZView
+This class manages the application views, to use this class you need create a new class that extends ZView and overides  dir (directory of view) and app(name of the application file)
+```php
+class View extends ZView{
+  protected static $dir = 'view/';
+  protected static $app = 'app.html';
+}
+```
+To visualized a view you must call the static method getView, passing the name of the view(without .html), the base(transform, the number of "/" in route in "../")
+  [
+    "/home"           =>    ""
+    "/utente/1225"    =>    "../"
+    "/utente/it/1225" =>    "../../"
+  ]
+and the eventual parameter as associative array
+In your app must exist the @include, so this class read a view in directory and replace @include with its content, and must exist the @base inside a head, here an example
+```php
+$title = "My app";
+View::getView("home", '', ["title" => $title]);
+```
+```html
+//app.html
+<html>
+  <head>
+    @base
+    <title>{{ $title }}</title>
+  </head>
+  <body>
+    <nav>This is my menu</nav>
+    @include('content')
+  </body>
+</html>
+
+//home.html
+<div>
+  That will be include
+</div>
+
+//result
+<html>
+  <head>
+    <base href="">
+    <title>My app</title>
+  </head>
+  <body>
+    <nav>This is my menu</nav>
+    <div>
+      That will be include
+    </div>
+  </body>
+</html>
+```
+
+In view you can use the blade instruction:
+```php
+@if($i < 0)
+@elseif($i < 0)
+@else
+@endif
+@for($i = 0; $i < sizeof($c); $i++)
+@endfor
+@foreach($a as $k => $v)
+@endoforeach
+@while($i < sizeof($c))
+@endwhile
+@dowhile
+@enddowhile($i < sizeof($c))
+```
+
+When in your application you want get a config you must call statically config method, passing the config's key and the optional default value
+```php
+ZConfig::config("APP_NAME", "Zexarel");
+```
+
 ## ZModel
