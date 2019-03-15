@@ -172,9 +172,27 @@ In view you can use the blade instruction:
 @enddowhile($i < sizeof($c))
 ```
 
-When in your application you want get a config you must call statically config method, passing the config's key and the optional default value
-```php
-ZConfig::config("APP_NAME", "Zexarel");
-```
-
 ## ZModel
+This class manages the model, a model is a part of HTML file, it use the blade instruction.
+To use this you need create a html model and a PHP class that extends ZModel choosing the directory and the name of the html model (without .html)
+```php
+//message.php
+class Message extends ZModel{
+  protected $dir = "model/";
+  protected $name = 'message';
+}
+```
+```html
+//message.html
+<div>
+  <font>{{ $this->sender}}</font>
+  <p>
+  {{ $this->body }}
+  </p>
+</div>
+```
+When you create a new object in constructor you pass the data, and call the method getHtml
+```php
+$m = new Message(["sender" => "Zexal0807", "body" => "This is the body of the message"]);
+echo $m->getHtml();
+```
