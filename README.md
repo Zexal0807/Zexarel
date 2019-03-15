@@ -84,7 +84,24 @@ public function getSQL() : string         //return the SQL string
 public function execute() : void          //execute
 public function executeSql($sql) : void   //execute a specific SQL
 ```
-
 ## ZRoute
+This class manages the S.P.A. Route, to use this class you need add the route calling the static methods (get, post, put, head, delete) passing the following parameters in the index.php file, and call the listen method at the end.
+```php
+public static function $method(string $route, callable $callback, string $name = null) : void
+```
+And
+Here an example
+```php
+ZRoute::get("/home", function (){
+  echo "This is my homepage"
+}, "home");
+
+ZRoute::listen();
+```
+If the name is set, you can call the method getUri padding the name, and you get the correct route
+```php
+ZRoute::getUri("home");
+```
+
 ## ZView
 ## ZModel
