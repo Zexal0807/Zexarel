@@ -15,7 +15,8 @@ class ZConfig{
 		foreach($f as $ff){
 			$a = explode(":", $ff);
 			if($a[0] == $name){
-				return str_replace("\r\n", "", $a[1]);
+				array_shift($a);
+				return str_replace(["\r\n", "\n", "\r"], "", implode(":", $a));
 			}
 		}
 		return $default;
