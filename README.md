@@ -157,7 +157,7 @@ View::getView("home", '', ["title" => $title]);
 ```
 
 In view you can use the blade instruction:
-```php
+```txt
 @if($i < 0)
 @elseif($i < 0)
 @else
