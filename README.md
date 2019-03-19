@@ -135,12 +135,14 @@ View::getView("home", '', ["title" => $title]);
     @include('content')
   </body>
 </html>
-
+```
+```html
 //home.html
 <div>
   That will be include
 </div>
-
+```
+```html
 //result
 <html>
   <head>
