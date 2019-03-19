@@ -13,6 +13,7 @@ Content:
     - [ZRoute](#ZRoute)
     - [ZView](#ZView)
     - [ZModel](#ZModel)
+    - [ZController](#ZController)
 
 ## find
 ```php
@@ -207,3 +208,22 @@ echo $m->getHtml();
   </p>
 </div>
 ```
+## ZController
+This class manages the controller, to use this you need create a class that extends ZController class and then you can add inside all method that you want
+```php
+class MyController extends ZController{
+  public function sayHello(){
+    echo "Hello World";
+  }
+}
+```
+When you want call that method you have you way:
+  - Create a object and call the method on it
+  ```php
+  $a = MyController();
+  $a->sayHello();
+  ```
+  - Call statically the method
+  ```php
+  MyController::sayHello();
+  ```
