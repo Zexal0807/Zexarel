@@ -24,7 +24,7 @@
 				"ZRoute" : "ZRoute.php"
 			},
 			"ZView" : {
-				"ZBladeCompiler" : "ZBladeCompiler",
+				"ZBladeCompiler" : "ZBladeCompiler.php",
 				"ZView" : "ZView.php",
 				"ZModel" : "ZModel.php"
 			}
