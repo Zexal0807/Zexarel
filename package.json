@@ -1,6 +1,6 @@
 {
 	"name" : "Zexarel",
-	"version" : "1.1.5",
+	"version" : "1.1.6",
 	"require" : {
 		"function" : {
 			"find" : "find.php",
@@ -14,9 +14,6 @@
 			},
 			"ZDatabase" : {
 				"ZDatabase" : "ZDatabase.php"
-			},
-			"ZController" : {
-				"ZController" : "ZController.php"
 			},
 			"ZRoute" : {
 				"Request" : "Request.php",
