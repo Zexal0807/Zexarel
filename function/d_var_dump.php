@@ -43,9 +43,9 @@ function _v($arr, $p){
 			echo "Array(".sizeof($arr).") {\r\n";
 			foreach($arr as $k => $v){
 				if(gettype($k) == "string"){
-					echo $p."\t".'["'.$k.'"] => ';
+					echo $p."\t".'["'.str_replace(["<", ">"], ["&lt;", "&gt;"], $k).'"] => ';
 				}else{
-					echo $p."\t"."[".$k."] => ";
+					echo $p."\t"."[".str_replace(["<", ">"], ["&lt;", "&gt;"], $k)."] => ";
 				}
 				_v($v, $p."\t");
 				echo "\r\n";
