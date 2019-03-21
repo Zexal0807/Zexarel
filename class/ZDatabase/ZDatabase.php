@@ -467,7 +467,7 @@ class ZDatabase{
 			return $sql;
 		}
 	}
-	public function execute(){
+	public function execute($beforeExecute = null, $afterExecute = null){
 		/*
 		Metodo execute
 		non ha argomenti
@@ -476,7 +476,7 @@ class ZDatabase{
 		$sql = "";
 		try{
 			$sql = $this->getSQL();
-			return $this->executeSql($sql);
+			return $this->executeSql($sql, $beforeExecute, $afterExecute);
 		}catch(Exception $e){
 			/*
 			possibile log
@@ -511,15 +511,23 @@ class ZDatabase{
 		metodo che viene richimato dopo dell'esecuzione della query, utile per dei log
 		*/
 	}
-	public function executeSql($sql){
+	public function executeSql($sql, $beforeExecute = null, $afterExecute = null){
 		/*
 		Metodo executeSql
 		ha un argomento
 		richiama il metodo beforeExecute passandogli la sql ricevuta in input, esegue la sql e nel caso essa inizi con "SELECT" mette in un array tutti i record ottenuti come risultato e ritorna esso altrimenti ritorna un array vuoto
 		*/
-		$this->beforeExecute($sql);
-        $result = $this->obj->query($sql);
-		$this->afterExecute($sql, $result, $this->obj->affected_rows);
+    if(isset($beforeExecute)){
+      call_user_func_array($beforeExecute, [$sql]);
+    }else{
+      $this->beforeExecute($sql);
+    }
+    $result = $this->obj->query($sql);
+    if(isset($afterExecute)){
+      call_user_func_array($afterExecute, [$sql, $result, $this->obj->affected_rows]);
+    }else{
+      $this->afterExecute($sql, $result, $this->obj->affected_rows);
+    }
 		$resultset = array();
 		if(substr($sql, 0, 6) == "SELECT"){
       if($result->num_rows > 0){
