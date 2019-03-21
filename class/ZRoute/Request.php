@@ -6,7 +6,7 @@ class Request{
 	private $cookie;
 	private $files;
 	public function __construct(){
-		$this->url = trim($_SERVER['REQUEST_URI'], '/\^$');
+		$this->url = isset($_REQUEST['uri']) ? trim($_REQUEST['uri'], '/\^$') :  trim($_SERVER['REQUEST_URI'], '/\^$');
 		$this->method = $_SERVER['REQUEST_METHOD'];
 		switch($this->method){
 			case "PUT":
