@@ -55,12 +55,10 @@ class Route{
 						if($r[$i] == $f[$k]){
 						}else{
 							if(preg_match('/\[+[a-zA-Z0-9]*+\]/', $f[$k])){
-								$e = str_replace(["[", "]"], "", $r[$i]);
-								$arr[str_replace(["[", "]"], "", $f[$k])] = ($e == $f[$k]);
+								$arr[str_replace(["[", "]"], "", $f[$k])] = ($r[$i] == $f[$k]);
 								$i--;
 							}elseif(preg_match('/\<+[a-zA-Z0-9]*+\>/', $f[$k])){
-								$e = str_replace(["<", ">"], "", $r[$i]);
-								$arr[$f[$k]] = $e;
+								$arr[str_replace(["<", ">"], "", $f[$k])] = $r[$i];
 							}
 						}
 					}
