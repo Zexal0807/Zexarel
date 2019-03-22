@@ -263,7 +263,7 @@ class ZDatabase{
 		}else{
 			array_push($this->error, "Table non settata nell'INSERT");
 		}
-		array_unshift($arg);
+		array_shift($arg);
 		if(sizeof($arg) > 0){
 			for($i = 1; $i < sizeof($arg); $i++){
 				array_push($this->insert, $arg[$i]);
