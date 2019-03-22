@@ -417,7 +417,11 @@ class ZDatabase{
 				for($i = 0; $i < sizeof($this->value); $i++){
 					$sql .= "(";
 					for($k = 0; $k < sizeof($this->value[$i]); $k++){
-						$sql .= $this->value[$i][$k];
+            if(!isset($this->value[$i][$k])){
+              $sql .= "null";
+            }else{
+              $sql .= $this->value[$i][$k];
+            }
 						if($k != sizeof($this->value[$i]) - 1){
 							$sql .= ", ";
 						}
@@ -430,6 +434,9 @@ class ZDatabase{
 			}else if(sizeof($this->update) > 0 && sizeof($this->set) > 0){
 				$sql = "UPDATE ".$this->update." SET";
 				for($i = 0; $i < sizeof($this->set); $i++){
+          if(!isset($this->set[$i][2])){
+            $this->set[$i][2] = "null";
+          }
 					$sql .= " ".implode(" = ", $this->set[$i]);
 					if($i != sizeof($this->set) - 1){
 						$sql .= ", ";
