@@ -46,8 +46,8 @@ class ZView{
 		return $this->html;
 	}
 
-	public static function get($content, $data = null){
-		return (new static($content, $data))->returnHtml();
+	public static function get($content, $base = null, $data = null){
+		return (new static($content, $base, $data))->returnHtml();
 	}
 
 }
