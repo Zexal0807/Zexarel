@@ -5,6 +5,9 @@ class ZDatabase{
 	protected $host;			//string, host del database
   protected $database;	//string, nome del database
 	private $obj;				  //oggetto mysqli
+
+  private static $operator = ["=", ">", ">=", "<", "<=", "LIKE", "<>", "IN", "BETWEEN", "IS NOT NULL"];
+
 	public function __construct() {
 		/*
 		Costruttore, inizializza tutti gli attributi come array vuoti (esclusi distinct che è un boolean e into che è una string)
@@ -126,7 +129,7 @@ class ZDatabase{
 		ha 3 argomenti
 		aggiunge all'attributo where un nuovo array conenente i tre argomenti presi in input
 		*/
-		if(!in_array($operator, ["=", ">", ">=", "<", "<=", "LIKE", "<>", "IN"])){
+		if(!in_array($operator, ZDatabase::$operator)){
 			array_push($this->error, "Errore nell'operatore del WHERE");
 		}else{
 			$a = $this->haveErrorChar($compare);
@@ -156,7 +159,7 @@ class ZDatabase{
 		ha 3 argomenti
 		aggiunge all'attributo having un nuovo array conenente i tre argomenti presi in input
 		*/
-		if(!in_array($operator, ["=", ">", ">=", "<", "<=", "LIKE", "<>", "IN"])){
+		if(!in_array($operator, ZDatabase::$operator)){
 			array_push($this->error, "Errore nell'operatore del HAVING");
 		}else{
 			$a = $this->haveErrorChar($compare);
@@ -186,7 +189,7 @@ class ZDatabase{
 		ha 4 argomenti
 		aggiunge all'attributo join un array contenente "INNER JOIN" e i 4 argomenti presi in input
 		*/
-		if(!in_array($operator, ["=", ">", ">=", "<", "<=", "LIKE", "<>"])){
+		if(!in_array($operator, ZDatabase::$operator)){
 			array_push($this->error, "Errore nell'operatore dell'INNER JOIN");
 		}else{
 			$a = $this->haveErrorChar($compare);
@@ -233,7 +236,7 @@ class ZDatabase{
 		ha 4 argomenti
 		aggiunge all'attributo join un array contenente "RIGHT JOIN" e i 4 argomenti presi in input
 		*/
-		if(!in_array($operator, ["=", ">", ">=", "<", "<=", "LIKE", "<>"])){
+		if(!in_array($operator, ZDatabase::$operator)){
 			array_push($this->error, "Errore nell'operatore del RIGHT JOIN");
 		}else{
 			$a = $this->haveErrorChar($compare);
