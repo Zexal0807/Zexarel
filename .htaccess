@@ -1,0 +1,9 @@
+ErrorDocument 400 /errors/badrequest.html
+ErrorDocument 401 /errors/authrequest.html
+ErrorDocument 403 /errors/forbidden.html
+ErrorDocument 404 /errors/notfound.html
+ErrorDocument 500 /errors/servererror.html
+<FilesMatch "^\.zenv">
+    Order allow,deny
+    Deny from all
+ </FilesMatch>
