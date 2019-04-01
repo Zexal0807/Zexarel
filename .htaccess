@@ -1,7 +1,3 @@
-ErrorDocument 403 /Zexarel/error/403.html
-ErrorDocument 404 /Zexarel/error/404.html
-ErrorDocument 405 /Zexarel/error/405.html
-ErrorDocument 500 /Zexarel/error/500.html
 <FilesMatch "^\.zenv">
     Order allow,deny
     Deny from all
