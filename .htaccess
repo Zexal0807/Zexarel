@@ -1,0 +1,10 @@
+<FilesMatch "^\.zenv">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+<FilesMatch "^\.htaccess">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+RewriteEngine On
+RewriteRule (^|/)log(/|$) - [F]
