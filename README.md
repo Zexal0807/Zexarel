@@ -1,6 +1,11 @@
 # Zexarel
 My personal PHP Framework
 
+# Installation & Usage
+To use this Framework you need download the code and put the Zexarel folder in your project, then create the .htaccess file and the .zenv file, in Zexarel folder there is an example
+Remember: In .htaccess file you could change the RewriteBasec option
+
+#Content
 Content:
   - Functions
     - [find](#find)
@@ -13,7 +18,7 @@ Content:
     - [ZRoute](#ZRoute)
     - [ZView](#ZView)
     - [ZModel](#ZModel)
-
+    - [ZLogger](#ZLogger)
 ## find
 ```php
 function find(string $what, string $in) : int
@@ -206,4 +211,24 @@ echo $m->getHtml();
   This is the body of the message
   </p>
 </div>
+```
+## ZLogger
+This class manages the log, to use this class you need create object and call on it the method.
+```php
+$l = new ZLogger();
+$l->debug("prova", ["yellow", "red", ["yellow", "red", "green"]])
+
+```
+And, here log content
+```txt
+[2019-04-01 13:09:48][DEBUG] : prova
+	Array(3) {
+		[0] => String : "yellow"
+		[1] => String : "red"
+		[2] => Array(3) {
+			[0] => String : "yellow"
+			[1] => String : "red"
+			[2] => String : "green"
+		}
+	}
 ```
