@@ -40,7 +40,9 @@ class ZRoute{
 				exit();
 			}
 		}
-		die($_SERVER['SERVER_PROTOCOL']." 404 Route Not Found");
+		http_response_code(404);
+		include(__DIR__ . "/../../error/404.html");
+		exit
 	}
 }
 ?>
