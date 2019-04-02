@@ -12,6 +12,10 @@
 			"ZConfig" : {
 				"ZConfig" : "ZConfig.php"
 			},
+			"ZLogger" : {
+				"Log" : "Log.php",
+				"ZLogger" : "ZLogger.php"
+			},
 			"ZDatabase" : {
 				"ZDatabase" : "ZDatabase.php"
 			},
