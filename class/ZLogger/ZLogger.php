@@ -1,6 +1,6 @@
 <?php
 class ZLogger{
-  
+
 	public function __construct(){
 		$dir = ZConfig::config("LOG_DIRECTORY", "logs");
 		if(!file_exists($dir)){
@@ -65,11 +65,4 @@ class ZLogger{
 		$this->write("EMERGENCY", $message, $data);
 	}
 }
-
-$a = new Logger();
-$b = $a->read();
-d_var_dump($b);
-//$a->debug("prova", ["banana", "arancia", ["banana", "arancia", "pesca"]]);
-
-
 ?>
