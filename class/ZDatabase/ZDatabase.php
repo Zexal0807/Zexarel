@@ -537,6 +537,10 @@ class ZDatabase{
     }else{
       $this->afterExecute($sql, $result, $this->obj->affected_rows);
     }
+    if($result == false){
+      $l = new ZLogger();
+      $l->error("Database return false on following query", $sql);
+    }
 		$resultset = array();
 		if(substr($sql, 0, 6) == "SELECT"){
       if($result->num_rows > 0){
