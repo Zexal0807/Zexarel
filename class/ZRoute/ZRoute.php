@@ -42,7 +42,7 @@ class ZRoute{
 		}
 		http_response_code(404);
 		include(__DIR__ . "/../../error/404.html");
-		exit
+		exit;
 	}
 }
 ?>
