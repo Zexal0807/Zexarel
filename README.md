@@ -5,7 +5,7 @@ My personal PHP Framework
 To use this Framework you need download the code and put the Zexarel folder in your project, then create the .htaccess file and the .zenv file, in Zexarel folder there is an example
 Remember: In .htaccess file you could change the RewriteBasec option
 
-#Content
+# Content
 Content:
   - Functions
     - [find](#find)
