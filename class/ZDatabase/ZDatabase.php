@@ -38,6 +38,7 @@ class ZDatabase{
 		$this->value = [];
 		$this->update = "";
 		$this->set = [];
+    $this->delete = false;
 		if(
 			isset($this->host) &&
 			isset($this->user) &&
@@ -78,6 +79,8 @@ class ZDatabase{
 
 	private $update;		//string, nome della tabella da updatare
 	private $set;			//array, contiene degli array in cui (0 => campo da updatare, 1 => nuovo valore)
+
+  private $delete;
 
 	private $error;			//array, contiene gli errori trovati durante la creazione della sql
 
@@ -331,8 +334,15 @@ class ZDatabase{
 				return $this;
 			}
 		}
-
 	}
+  public function delete(){
+    /*
+    Metodo delete
+    non ha argomenti
+    setta la query come delete
+    */
+    $this->delete = true;
+  }
 	public function getSQL(){
 		/*
 		Metodo getSQL
@@ -456,9 +466,28 @@ class ZDatabase{
 						}
 					}
 				}
+			}elseif($this->delete){
+        $sql = "DELETE FROM ";
+        for($i = 0; $i < sizeof($this->from); $i++){
+          $sql .=  $this->from[$i];
+          if($i < sizeof($this->from) - 1){
+            $sql .= " ,";
+          }
+        }
+        if(sizeof($this->where) > 0){
+					for($i = 0; $i < sizeof($this->where); $i++){
+						if($i == 0){
+							$sql .= " WHERE";
+						}
+						$sql .= " ".implode(" ", $this->where[$i]);
+						if($i < sizeof($this->where) - 1){
+							$sql .= " AND";
+						}
+					}
+				}
 			}else{
-				//possibile ??
-			}
+        //possibile ??
+      }
 			$this->select = [];
 			$this->distinct = false;
 			$this->from = [];
@@ -473,6 +502,7 @@ class ZDatabase{
 			$this->value = [];
 			$this->update = "";
 			$this->set = [];
+      $this->delete = false;
 			return $sql;
 		}
 	}
