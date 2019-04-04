@@ -19,6 +19,10 @@
 			"ZDatabase" : {
 				"ZDatabase" : "ZDatabase.php"
 			},
+			"ZSession" : {
+				"DatabaseSession" : "DatabaseSession.php",
+				"ZSession" : "ZSession.php"
+			},
 			"ZRoute" : {
 				"Request" : "Request.php",
 				"Route" : "Route.php",
