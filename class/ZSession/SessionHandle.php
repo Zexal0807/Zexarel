@@ -82,19 +82,15 @@ class SessionHandle{
   /*
   The garbage collector callback is invoked internally by PHP periodically in order to purge old session data. The frequency is controlled by session.gc_probability and session.gc_divisor. The value of lifetime which is passed to this callback can be set in session.gc_maxlifetime. Return value should be TRUE for success, FALSE for failure.
   */
-  /**
-   * Garbage Collector
-   * @param int life time (sec.)
-   * @return bool
-   * @see session.gc_divisor      100
-   * @see session.gc_maxlifetime 1440
-   * @see session.gc_probability    1
-   * @usage execution rate 1/100
-   *        (session.gc_probability/session.gc_divisor)
-   */
-
   public function gc($max){
     $limit = time() - (3600 * 24 * 7);
+    $this->conn
+      ->delete()
+      ->from(ZConfig::config("SESSION_DB_TABLE", "session"))
+      ->where("time", "<", $limit)
+      ->execute(null, function($sql, $result, $row){
+        return $result;
+      });
   }
 }
 ?>
