@@ -16,6 +16,9 @@
 				"Log" : "Log.php",
 				"ZLogger" : "ZLogger.php"
 			},
+			"ZKernel" : {
+				"ZKernel" : "ZKernel.php"
+			},
 			"ZDatabase" : {
 				"ZDatabase" : "ZDatabase.php"
 			},
