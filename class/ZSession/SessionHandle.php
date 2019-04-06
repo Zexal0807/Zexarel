@@ -5,7 +5,19 @@ class SessionHandle{
 
   public function __construct(){
     $this->conn = new DatabaseSession();
+    $this->createTable();
   }
+
+  private function createTable(){
+    $this->conn->executeSql('CREATE TABLE IF NOT EXISTS '.ZConfig::config("SESSION_DB_TABLE", "session").'(
+      id varchar(255) NOT NULL,
+      data mediumtext NOT NULL,
+      time int(255) NOT NULL,
+      ip varchar(255) NOT NULL,
+      PRIMARY KEY (id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
+  }
+
 
   /*
   The open callback works like a constructor in classes and is executed when the session is being opened. It is the first callback function executed when the session is started automatically or manually with session_start(). Return value is TRUE for success, FALSE for failure.
