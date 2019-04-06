@@ -12,7 +12,7 @@ class SessionHandle{
     $this->conn->executeSql('CREATE TABLE IF NOT EXISTS '.ZConfig::config("SESSION_DB_TABLE", "session").'(
       id varchar(255) NOT NULL,
       data mediumtext NOT NULL,
-      time int(255) NOT NULL,
+      lastUpdate datetime NOT NULL,
       ip varchar(255) NOT NULL,
       PRIMARY KEY (id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
@@ -22,11 +22,10 @@ class SessionHandle{
   The open callback works like a constructor in classes and is executed when the session is being opened. It is the first callback function executed when the session is started automatically or manually with session_start(). Return value is TRUE for success, FALSE for failure.
   */
   public function open($savePath, $sessionName){
-    $limit = time() - (3600 * 24 * 7);
     $this->conn
       ->delete()
       ->from(ZConfig::config("SESSION_DB_TABLE", "session"))
-      ->where("time", "<", $limit)
+      ->where("lastUpdate", "<", date("Y-m-d H:i:s", strtotime("-7day")))
       ->execute(null, function($sql, $result, $row){
         return $result;
       });
