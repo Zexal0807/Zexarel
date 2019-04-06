@@ -349,6 +349,7 @@ class ZDatabase{
     setta la query come delete
     */
     $this->delete = true;
+    return $this;
   }
 	public function getSQL(){
 		/*
