@@ -39,7 +39,47 @@ class SessionHandle{
   public function close(){
     return $this->conn->close();
   }
+
+  /*
+  The read callback must always return a session encoded (serialized) string, or an empty string if there is no data to read.
+  This callback is called internally by PHP when the session starts or when session_start() is called. Before this callback is invoked PHP will invoke the open callback.
+  The value this callback returns must be in exactly the same serialized format that was originally passed for storage to the write callback. The value returned will be unserialized automatically by PHP and used to populate the $_SESSION superglobal. While the data looks similar to serialize() please note it is a different format which is specified in the session.serialize_handler ini setting.
+  */
+  public function read($id){/*
   }
 
+  /*
+  The write callback is called when the session needs to be saved and closed. This callback receives the current session ID a serialized version the $_SESSION superglobal. The serialization method used internally by PHP is specified in the session.serialize_handler ini setting.
+  The serialized session data passed to this callback should be stored against the passed session ID. When retrieving this data, the read callback must return the exact value that was originally passed to the write callback.
+  This callback is invoked when PHP shuts down or explicitly when session_write_close() is called. Note that after executing this function PHP will internally execute the close callback.
+  */
+  public function write($id, $data){
+    });
+  }
+
+  /*
+  This callback is executed when a session is destroyed with session_destroy() or with session_regenerate_id() with the destroy parameter set to TRUE. Return value should be TRUE for success, FALSE for failure.
+  */
+  public function destroy($id){
+    /*
+  }
+
+  /*
+  The garbage collector callback is invoked internally by PHP periodically in order to purge old session data. The frequency is controlled by session.gc_probability and session.gc_divisor. The value of lifetime which is passed to this callback can be set in session.gc_maxlifetime. Return value should be TRUE for success, FALSE for failure.
+  */
+  /**
+   * Garbage Collector
+   * @param int life time (sec.)
+   * @return bool
+   * @see session.gc_divisor      100
+   * @see session.gc_maxlifetime 1440
+   * @see session.gc_probability    1
+   * @usage execution rate 1/100
+   *        (session.gc_probability/session.gc_divisor)
+   */
+
+  public function gc($max){
+    $limit = time() - (3600 * 24 * 7);
+  }
 }
 ?>
