@@ -68,7 +68,7 @@ class ZDatabase{
     /*
     Metodo per chiudere la connessione
     */
-		$this->obj->close();
+		return $this->obj->close();
 	}
 
 	private $select;		//array, elenco dei campi da selezionare
