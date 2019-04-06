@@ -12,6 +12,12 @@ class SessionHandle{
   */
   public function open($savePath, $sessionName){
 
+  /*
+  The close callback works like a destructor in classes and is executed after the session write callback has been called. It is also invoked when session_write_close() is called. Return value should be TRUE for success, FALSE for failure.
+  */
+  public function close(){
+    return $this->conn->close();
+  }
   }
 
 }
