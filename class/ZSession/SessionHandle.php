@@ -18,7 +18,6 @@ class SessionHandle{
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8');
   }
 
-
   /*
   The open callback works like a constructor in classes and is executed when the session is being opened. It is the first callback function executed when the session is started automatically or manually with session_start(). Return value is TRUE for success, FALSE for failure.
   */
@@ -45,7 +44,17 @@ class SessionHandle{
   This callback is called internally by PHP when the session starts or when session_start() is called. Before this callback is invoked PHP will invoke the open callback.
   The value this callback returns must be in exactly the same serialized format that was originally passed for storage to the write callback. The value returned will be unserialized automatically by PHP and used to populate the $_SESSION superglobal. While the data looks similar to serialize() please note it is a different format which is specified in the session.serialize_handler ini setting.
   */
-  public function read($id){/*
+  public function read($id){
+    $ret = $this->conn
+      ->select("data")
+      ->from(ZConfig::config("SESSION_DB_TABLE", "session"))
+      ->where("id", "=", $id)
+      ->execute();
+    if(sizeof($ret) > 0){
+      return $ret[0];
+    }else{
+      return false;
+    }
   }
 
   /*
