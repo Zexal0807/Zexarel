@@ -61,6 +61,13 @@ class ZDatabase{
 		/*
 		Distruttore, chiude la connessione
 		*/
+    $this->close();
+  }
+
+  public function close(){
+    /*
+    Metodo per chiudere la connessione
+    */
 		$this->obj->close();
 	}
 
