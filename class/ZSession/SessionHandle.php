@@ -62,6 +62,15 @@ class SessionHandle{
   This callback is invoked when PHP shuts down or explicitly when session_write_close() is called. Note that after executing this function PHP will internally execute the close callback.
   */
   public function write($id, $data){
+    $sql = sprintf("REPLACE INTO %s VALUES('%s', '%s', '%s', '%s')",
+      ZConfig::config("SESSION_DB_TABLE", "session"),
+      $id,
+      $data,
+       date("Y-m-d H:i:s"),
+      $_SERVER['REMOTE_ADDR']
+    );
+    $this->conn->executeSql($sql, null, function($sql, $result, $row){
+      return $result;
     });
   }
 
@@ -82,11 +91,10 @@ class SessionHandle{
   The garbage collector callback is invoked internally by PHP periodically in order to purge old session data. The frequency is controlled by session.gc_probability and session.gc_divisor. The value of lifetime which is passed to this callback can be set in session.gc_maxlifetime. Return value should be TRUE for success, FALSE for failure.
   */
   public function gc($max){
-    $limit = time() - (3600 * 24 * 7);
     $this->conn
       ->delete()
       ->from(ZConfig::config("SESSION_DB_TABLE", "session"))
-      ->where("time", "<", $limit)
+      ->where("lastUpdate", "<", date("Y-m-d H:i:s", strtotime("-7day")))
       ->execute(null, function($sql, $result, $row){
         return $result;
       });
