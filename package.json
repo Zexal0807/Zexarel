@@ -21,6 +21,7 @@
 			},
 			"ZSession" : {
 				"DatabaseSession" : "DatabaseSession.php",
+				"SessionHandle" : "SessionHandle.php",
 				"ZSession" : "ZSession.php"
 			},
 			"ZRoute" : {
