@@ -14,6 +14,5 @@ class ZSession{
   }
 }
 if(ZConfig::config("USE_DATABASE_SESSION", false)){
-  echo 1;
   ZSession::start();
 }
