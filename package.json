@@ -16,16 +16,8 @@
 				"Log" : "Log.php",
 				"ZLogger" : "ZLogger.php"
 			},
-			"ZKernel" : {
-				"ZKernel" : "ZKernel.php"
-			},
 			"ZDatabase" : {
 				"ZDatabase" : "ZDatabase.php"
-			},
-			"ZSession" : {
-				"DatabaseSession" : "DatabaseSession.php",
-				"SessionHandle" : "SessionHandle.php",
-				"ZSession" : "ZSession.php"
 			},
 			"ZRoute" : {
 				"Request" : "Request.php",
