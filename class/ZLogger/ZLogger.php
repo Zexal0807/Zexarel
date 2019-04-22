@@ -1,4 +1,5 @@
 <?php
+include 'Log.php';
 class ZLogger{
 
 	public function __construct(){
