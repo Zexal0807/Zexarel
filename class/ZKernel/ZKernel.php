@@ -53,5 +53,18 @@ class ZKernel{
 	Handler to catch warnings and notices.
 	*/
 	public static function errorHandler($severity, $message, $file, $line, $context){
+    d_var_dump("errorHandler");
+    d_var_dump($severity);
+		d_var_dump($message);
+		d_var_dump($file);
+		d_var_dump($line);
+		d_var_dump($context);
+		if($severity === E_RECOVERABLE_ERROR || $severity === E_USER_ERROR){
+			$e = new ErrorException($message, 0, $severity, $file, $line);
+			$e->context = $context;
+      throw $e;
+		}
+		//forse log
+		return false;
 	}
 }
