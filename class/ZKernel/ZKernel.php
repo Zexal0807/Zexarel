@@ -56,23 +56,27 @@ class ZKernel{
 				(isset($_SERVER['HTTP_USER_AGENT']) && find('MSIE ', $_SERVER['HTTP_USER_AGENT']) >= 0) ? 503 : 500
 			);
 		}
+		if(ZConfig::config("KERNEL_WRITE_LOG", true)){
+			$l = new ZLogger();
+			$l->error("Exception throw: ".$exception->message." at ".$exception->file." on line ".$exception->line);
+		}
+		if(preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i", ZConfig::config("KERNEL_SEND_EMAIL", false))){
+			mail(
+				ZConfig::config("KERNEL_SEND_EMAIL", false),
+				"Exception throw",
+				"Exception throw: ".$exception->message." at ".$exception->file." on line ".$exception->line
+			);
+		}
 	}
 	/*
 	Handler to catch warnings and notices.
 	*/
 	public static function errorHandler($severity, $message, $file, $line, $context){
-    d_var_dump("errorHandler");
-    d_var_dump($severity);
-		d_var_dump($message);
-		d_var_dump($file);
-		d_var_dump($line);
-		d_var_dump($context);
 		if($severity === E_RECOVERABLE_ERROR || $severity === E_USER_ERROR){
 			$e = new ErrorException($message, 0, $severity, $file, $line);
 			$e->context = $context;
       throw $e;
 		}
-		//forse log
 		return false;
 	}
 }
