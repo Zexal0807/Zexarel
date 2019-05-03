@@ -7,6 +7,7 @@ DB_DATABASE:my_database
 
 LOG_DIRECTORY:logs
 
+KERNEL_ENABLE:true
 
 SESSION_ENABLE:false
 SESSION_DB_HOST:localhost

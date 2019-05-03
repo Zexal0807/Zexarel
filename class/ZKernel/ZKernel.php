@@ -76,3 +76,7 @@ class ZKernel{
 		return false;
 	}
 }
+
+if(ZConfig::config("KERNEL_ENABLE", true)){
+	ZKernel::enable();
+}
