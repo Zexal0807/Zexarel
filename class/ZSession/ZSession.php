@@ -13,6 +13,6 @@ class ZSession{
     session_start();
   }
 }
-if(ZConfig::config("USE_DATABASE_SESSION", false)){
+if(ZConfig::config("SESSION_ENABLE", false)){
   ZSession::start();
 }
