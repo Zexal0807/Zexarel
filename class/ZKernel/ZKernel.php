@@ -48,6 +48,14 @@ class ZKernel{
 	Handler to catch uncaught exception.
 	*/
 	public static function exceptionHandler($exception, $exit = null){
+    if(!isset($exit)){
+			$exit = true;
+		}
+		if(!headers_sent()){
+			http_response_code(
+				(isset($_SERVER['HTTP_USER_AGENT']) && find('MSIE ', $_SERVER['HTTP_USER_AGENT']) >= 0) ? 503 : 500
+			);
+		}
 	}
 	/*
 	Handler to catch warnings and notices.
