@@ -8,6 +8,8 @@ DB_DATABASE:my_database
 LOG_DIRECTORY:logs
 
 KERNEL_ENABLE:true
+KERNEL_WRITE_LOG:true
+KERNEL_SEND_EMAIL:example@gmail.com
 
 SESSION_ENABLE:false
 SESSION_DB_HOST:localhost
