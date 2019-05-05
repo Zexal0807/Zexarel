@@ -56,13 +56,13 @@ class ZKernel{
 				(isset($_SERVER['HTTP_USER_AGENT']) && find('MSIE ', $_SERVER['HTTP_USER_AGENT']) >= 0) ? 503 : 500
 			);
 		}
-		if(ZConfig::config("KERNEL_WRITE_LOG", true)){
+		if(ZConfig::config("KERNEL_WRITE_LOG", "true") == "true"){
 			$l = new ZLogger();
 			$l->error("Exception throw: ".$exception->message." at ".$exception->file." on line ".$exception->line);
 		}
-		if(preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i", ZConfig::config("KERNEL_SEND_EMAIL", false))){
+		if(preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/i", ZConfig::config("KERNEL_SEND_EMAIL", "false"))){
 			mail(
-				ZConfig::config("KERNEL_SEND_EMAIL", false),
+				ZConfig::config("KERNEL_SEND_EMAIL", "false"),
 				"Exception throw",
 				"Exception throw: ".$exception->message." at ".$exception->file." on line ".$exception->line
 			);
