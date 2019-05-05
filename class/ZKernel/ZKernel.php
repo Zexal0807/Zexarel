@@ -81,6 +81,6 @@ class ZKernel{
 	}
 }
 
-if(ZConfig::config("KERNEL_ENABLE", true)){
+if(ZConfig::config("KERNEL_ENABLE", "true") == "true"){
 	ZKernel::enable();
 }

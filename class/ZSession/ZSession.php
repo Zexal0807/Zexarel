@@ -13,6 +13,6 @@ class ZSession{
     session_start();
   }
 }
-if(ZConfig::config("SESSION_ENABLE", false)){
+if(ZConfig::config("SESSION_ENABLE", "false") == "true"){
   ZSession::start();
 }
