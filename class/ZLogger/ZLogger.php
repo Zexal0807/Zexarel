@@ -2,7 +2,7 @@
 class ZLogger{
 
 	public function __construct(){
-		$dir = ZConfig::config("LOG_DIRECTORY", "logs");
+		$dir = __DIR__."../../../../".ZConfig::config("LOG_DIRECTORY", "logs");
 		if(!file_exists($dir)){
 			mkdir($dir);
 		}
