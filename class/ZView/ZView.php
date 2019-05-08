@@ -19,7 +19,7 @@ class ZView{
 	}
 
 	private static function loadYield($name){
-		return file_get_contents(ZView::$dir . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . $name.(find(".", $name) < 0 ? ".html" : ""));
+		return file_get_contents(ZView::$dir . DIRECTORY_SEPARATOR . ".." . DIRECTORY_SEPARATOR . $name.(find(".", substr($name, -6)) < 0 ? ".html" : ""));
 	}
 
 	public static function get($content, $base = null, $data = null){
