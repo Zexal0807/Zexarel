@@ -66,7 +66,7 @@ class SessionHandle{
       ZConfig::config("SESSION_DB_TABLE", "session"),
       $id,
       $data,
-       date("Y-m-d H:i:s"),
+      date("Y-m-d H:i:s"),
       $_SERVER['REMOTE_ADDR']
     );
     $this->conn->executeSql($sql, null, function($sql, $result, $row){
