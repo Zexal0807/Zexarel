@@ -1,17 +1,27 @@
 <?php
-class ZDatabase{
+class ZDatabase extends mysqli{
   protected $user;			//string, username del database
   protected $password;	//string, password del database
 	protected $host;			//string, host del database
   protected $database;	//string, nome del database
-	private $obj;				  //oggetto mysqli
 
-  private static $operator = ["=", ">", ">=", "<", "<=", "LIKE", "<>", "IN", "BETWEEN", "IS NOT NULL"];
+  private $sql = [];
+  private $countSql = -1;
+
+  private static $operator = [
+    "=",
+    ">",
+    ">=",
+    "<",
+    "<=",
+    "LIKE",
+    "<>",
+    "IN",
+    "BETWEEN",
+    "IS NULL",
+    "IS NOT NULL"];
 
 	public function __construct() {
-		/*
-		Costruttore, inizializza tutti gli attributi come array vuoti (esclusi distinct che è un boolean e into che è una string)
-		*/
     if(!isset($this->host)){
 	    $this->host = ZConfig::config("DB_HOST", "");
     }
@@ -24,21 +34,6 @@ class ZDatabase{
     if(!isset($this->database)){
 	    $this->database = ZConfig::config("DB_DATABASE", "");
 		}
-		$this->select = [];
-		$this->distinct = false;
-		$this->from = [];
-		$this->where = [];
-		$this->groupBy = [];
-		$this->having = [];
-		$this->orderBy = [];
-		$this->join = [];
-		$this->error = [];
-		$this->insert = [];
-		$this->into = "";
-		$this->value = [];
-		$this->update = "";
-		$this->set = [];
-    $this->delete = false;
 		if(
 			isset($this->host) &&
 			isset($this->user) &&
@@ -48,487 +43,377 @@ class ZDatabase{
 			$this->user != "" &&
 			$this->database != ""
 		){
-			$this->obj = new mysqli($this->host, $this->user, $this->password, $this->database);
+			parent::__construct($this->host, $this->user, $this->password, $this->database);
 		}else{
-			throw new Exception("Database connection setting not completed");
-		}/*
-		if($this->obj){
-			throw new Exception("Database connection not stabilized");
-		}*/
-    }
-
-	public function __destruct(){
-		/*
-		Distruttore, chiude la connessione
-		*/
-    $this->close();
+			//throw new Exception("Database connection setting not completed");
+		}
   }
 
-  public function close(){
-    /*
-    Metodo per chiudere la connessione
-    */
-		return $this->obj->close();
-	}
-
-	private $select;		//array, elenco dei campi da selezionare
-	private $distinct;		//boolean, la select è una distinc
-	private $from;			//array, elenco delle tabelle da cui fare la select
-	private $where;			//array, contiene degli array in cui (0 => campo, 1 => operatore, 2 => compare)
-	private $orderBy;		//array, elenco dei campi in cui ordinare
-	private $groupBy;		//array, elenco dei campi da raggruppare
-	private $having;		//array, contiene degli array in cui (0 => campo, 1 => operatore, 2 => compare)
-	private $join;			//array, contiene degli array in cui (0 => tabella, 1 => campo dalla tabella 1, 2 => compare, 3 => campo della tabella 2)
-
-	private $insert;		//array, elenco dei campi che vengono inseriti
-	private $into;			//string, nome tabella in cui inserire i valori
-	private $value;			//array, contiene i valori da inserire
-
-	private $update;		//string, nome della tabella da updatare
-	private $set;			//array, contiene degli array in cui (0 => campo da updatare, 1 => nuovo valore)
-
-  private $delete;
-
-	private $error;			//array, contiene gli errori trovati durante la creazione della sql
-
 	public function select(){
-		/*
-		Metodo select
-		ha un numero infinito di argomenti
-		aggiunge all'attributo select uno o più nuovi campi
-		*/
 		$field = func_get_args();
-		foreach($field as $k => $v){
-			array_push($this->select, $v);
-		}
+    $this->sql[]['select'] = [];
+    $this->countSql++;
+    foreach($field as $f){
+      if(preg_match('/[a-zA-Z0-9\(\)]*(\s+(AS|as)+\s+[a-zA-Z0-9]*)?/', $f)){
+        array_push($this->sql[$this->countSql]['select'], $f);
+      }
+    }
 		return $this;
 	}
 	public function selectAll(){
-		/*
-		Metodo selectAll
-		non ha argomenti
-		chiama il methodo select passano
-		*/
 		return $this->select("*");
 	}
 	public function selectDistinct(){
-		/*
-		Metodo selectDistinct
-		ha un numero infinito di argomenti
-		setta l'attributo distinct a true chiama il metodo select passano gli argomenti che ha ricevuto
-		*/
-		$field = func_get_args();
-		$this->distinct = true;
-		return $this->select($field);
+    $field = func_get_args();
+    call_user_func_array("self::select", $field);
+    //$this->select($field);
+    $this->sql[$this->countSql]['distinct'] = true;
+		return $this;
 	}
 	public function from(){
-		/*
-		Metodo from
-		non ha un argomenti
-		aggiunge all'attributo from uno o più nuove tabelle
-		*/
 		$tables = func_get_args();
-		foreach($tables as $k => $v){
-			array_push($this->from, $v);
+    if(isset($tables[0]) && $tables[0] instanceof ZDatabase){
+      $a = $this->sql[$this->countSql];
+      unset($this->sql[$this->countSql]);
+      $this->countSql--;
+    }else{
+      $a = $tables;
+    }
+    $this->sql[$this->countSql]['from'] = $a;
+    return $this;
+  }
+  public function where($field, $operator, $compare = null, $pre = null, $post = null){
+    if(in_array($operator, ZDatabase::$operator)){
+      if(isset($compare)){
+        $compare = $this->haveErrorChar($compare);
+      }
+			if(gettype($compare) == 'string'){
+				$compare = "'".$compare."'";
+			}elseif(!isset($compare)){
+        $compare = "NULL";
+      }
+      if(!isset($this->sql[$this->countSql]['where'])){
+        $this->sql[$this->countSql]['where'] = [];
+      }
+			array_push($this->sql[$this->countSql]['where'], [$field, $operator, $compare, $pre, $post]);
 		}
 		return $this;
     }
-    public function where($field, $operator, $compare){
-		/*
-		Metodo where
-		ha 3 argomenti
-		aggiunge all'attributo where un nuovo array conenente i tre argomenti presi in input
-		*/
-		if(!in_array($operator, ZDatabase::$operator)){
-			array_push($this->error, "Errore nell'operatore del WHERE");
-		}else{
-			$a = $this->haveErrorChar($compare);
-			if($a == false && $a != 0){
-				array_push($this->error, "Errore nel campo di comparazione del WHERE");
-			}else{
-				if(gettype($compare) == 'string'){
-					$a = "'".$a."'";
-				}
-				array_push($this->where, [$field, $operator, $a]);
-			}
+  public function groupBy(){
+  	$group_options = func_get_args();
+    if(!isset($this->sql[$this->countSql]['groupBy'])){
+      $this->sql[$this->countSql]['groupBy'] = [];
+    }
+    foreach($group_options as $o){
+      array_push($this->sql[$this->countSql]['groupBy'], $o);
+    }
+		return $this;
+  }
+	public function having($field, $operator, $compare = null, $pre = null, $post = null){
+    if(in_array($operator, ZDatabase::$operator)){
+      if(isset($compare)){
+        $compare = $this->haveErrorChar($compare);
+      }
+			if(gettype($compare) == 'string'){
+				$compare = "'".$compare."'";
+			}elseif(!isset($compare)){
+        $compare = "NULL";
+      }
+      if(!isset($this->sql[$this->countSql]['having'])){
+        $this->sql[$this->countSql]['having'] = [];
+      }
+			array_push($this->sql[$this->countSql]['having'], [$field, $operator, $compare, $pre, $post]);
 		}
 		return $this;
     }
-    public function groupBy($group_options){
-		/*
-		Metodo groupBy
-		ha un argomento
-		aggiunge all'attributo groupBy un campo
-		*/
-        array_push($this->groupBy, $group_options);
-		return $this;
+	public function orderBy(){
+    if(!isset($this->sql[$this->countSql]['orderBy'])){
+      $this->sql[$this->countSql]['orderBy'] = [];
     }
-	public function having($field, $operator, $compare){
-		/*
-		Metodo having
-		ha 3 argomenti
-		aggiunge all'attributo having un nuovo array conenente i tre argomenti presi in input
-		*/
-		if(!in_array($operator, ZDatabase::$operator)){
-			array_push($this->error, "Errore nell'operatore del HAVING");
-		}else{
-			$a = $this->haveErrorChar($compare);
-			if($a == false && $a != 0){
-				array_push($this->error, "Errore nel campo di comparazione del HAVING");
-			}else{
-				if(gettype($compare) == 'string'){
-					$a = "'".$a."'";
-				}
-				array_push($this->having, [$field, $operator, $a]);
-			}
-		}
-		return $this;
+    $order_options = func_get_args();
+    foreach($order_options as $o){
+      array_push($this->sql[$this->countSql]['orderBy'], $o);
     }
-	public function orderBy($order_options){
-		/*
-		Metodo orderBy
-		ha un argomento
-		aggiunge all'attributo orderBy un campo
-		*/
-		array_push($this->orderBy, $order_options);
 		return $this;
+  }
+	public function innerJoin($table, $on, $operator, $compare = null){
+    if(in_array($operator, ZDatabase::$operator)){
+      if(isset($compare)){
+        $compare = $this->haveErrorChar($compare);
+      }
+      if(gettype($compare) == 'string'){
+        $compare = "'".$compare."'";
+      }elseif(!isset($compare)){
+        $compare = "NULL";
+      }
+      if(!isset($this->sql[$this->countSql]['join'])){
+        $this->sql[$this->countSql]['join'] = [];
+      }
+      array_push($this->sql[$this->countSql]['join'], ["INNER JOIN", $table, $on, $operator, $compare]);
     }
-	public function innerJoin($table, $on, $operator, $compare){
-		/*
-		Metodo innerJoin
-		ha 4 argomenti
-		aggiunge all'attributo join un array contenente "INNER JOIN" e i 4 argomenti presi in input
-		*/
-		if(!in_array($operator, ZDatabase::$operator)){
-			array_push($this->error, "Errore nell'operatore dell'INNER JOIN");
-		}else{
-			$a = $this->haveErrorChar($compare);
-			if($a == false && $a != 0){
-				array_push($this->error, "Errore nel campo di comparazione dell'INNER JOIN");
-			}else{
-				if(gettype($compare) == 'string'){
-					if(strpos($a, ".") == false){
-						$a = "'".$a."'";
-					}
-				}
-				array_push($this->join, ["INNER JOIN", $table, $on, $operator, $a]);
-			}
-		}
-		return $this;
+    return $this;
 	}
-	public function leftJoin($table, $on, $operator, $compare){
-		/*
-		Metodo leftJoin
-		ha 4 argomenti
-		aggiunge all'attributo join un array contenente "LEFT JOIN" e i 4 argomenti presi in input
-		*/
-		if(!in_array($operator, ["=", ">", ">=", "<", "<=", "LIKE", "<>"])){
-			array_push($this->error, "Errore nell'operatore del LEFT JOIN");
-		}else{
-			$a = $this->haveErrorChar($compare);
-			if($a == false && $a != 0){
-				array_push($this->error, "Errore nel campo di comparazione dell'LEFT JOIN");
-			}else{
-				if(gettype($compare) == 'string'){
-					if(strpos($a, ".") == false){
-						$a = "'".$a."'";
-					}
-				}
-				array_push($this->join, ["LEFT JOIN", $table, $on, $operator, $a]);
+	public function leftJoin($table, $on, $operator, $compare = null){
+    if(in_array($operator, ZDatabase::$operator)){
+      if(isset($compare)){
+        $compare = $this->haveErrorChar($compare);
+      }
+      if(gettype($compare) == 'string'){
+        $compare = "'".$compare."'";
+      }elseif(!isset($compare)){
+        $compare = "NULL";
+      }
+      if(!isset($this->sql[$this->countSql]['join'])){
+        $this->sql[$this->countSql]['join'] = [];
+      }
+      array_push($this->sql[$this->countSql]['join'], ["LEFT JOIN", $table, $on, $operator, $compare]);
+    }
+    return $this;
+	}
+	public function rightJoin($table, $on, $operator, $compare = null){
+    if(in_array($operator, ZDatabase::$operator)){
+      if(isset($compare)){
+        $compare = $this->haveErrorChar($compare);
+      }
+      if(gettype($compare) == 'string'){
+        $compare = "'".$compare."'";
+      }elseif(!isset($compare)){
+        $compare = "NULL";
+      }
+      if(!isset($this->sql[$this->countSql]['join'])){
+        $this->sql[$this->countSql]['join'] = [];
+      }
+      array_push($this->sql[$this->countSql]['join'], ["RIGHT JOIN", $table, $on, $operator, $compare]);
+    }
+    return $this;
+	}
 
-			}
-		}
-		return $this;
-	}
-	public function rightJoin($table, $on, $operator, $compare){
-		/*
-		Metodo leftJoin
-		ha 4 argomenti
-		aggiunge all'attributo join un array contenente "RIGHT JOIN" e i 4 argomenti presi in input
-		*/
-		if(!in_array($operator, ZDatabase::$operator)){
-			array_push($this->error, "Errore nell'operatore del RIGHT JOIN");
-		}else{
-			$a = $this->haveErrorChar($compare);
-			if($a == false && $a != 0){
-				array_push($this->error, "Errore nel campo di comparazione dell'RIGHT JOIN");
-			}else{
-				if(gettype($compare) == 'string'){
-					if(strpos($a, ".") == false){
-						$a = "'".$a."'";
-					}
-				}
-				array_push($this->join, ["RIGHT JOIN", $table, $on, $operator, $a]);
+  public function build(){
+    $sql = "";
+    if(isset($this->sql[0]['select'])){
+      $sql = $this->buildQuerySelect($this->sql[0]);
+    }elseif(isset($this->sql[0]['insert'])){
+      $sql = $this->buildQueryInsert($this->sql[0]);
+    }elseif(isset($this->sql[0]['update'])){
+      $sql = $this->buildQueryUpdate($this->sql[0]);
+    }elseif(isset($this->sql[0]['delete'])){
+      $sql = $this->buildQueryDelete($this->sql[0]);
+    }
+    unset($this->sql[0]);
+    $this->countSql = 0;
+    return $sql;
+  }
+  private function buildQuerySelect($data){
+    $sql = $this->buildSelect($data);
+    $sql .= $this->buildFrom($data);
+    $sql .= $this->buildJoin($data);
+    $sql .= $this->buildWhere($data);
+    $sql .= $this->buildGroupBy($data);
+    $sql .= $this->buildOrderBy($data);
+    return $sql;
+  }
+  private function buildSelect($data){
+    return "SELECT ".(isset($data['distinct']) ? "DISTINCT " : "").implode(", ", $data['select']);
+  }
+  private function buildFrom($data){
+    $sql = " FROM ";
+    if(isset($data['from']['select'])){
+      $sql .= "(".$this->buildQuerySelect($data['from']).")";
+    }else{
+      $sql .= implode(", ", $data['from']);
+    }
+    return $sql;
+  }
+  private function buildJoin($data){
+    $sql = "";
+    if(isset($data['join'])){
+      for($i = 0; $i < sizeof($data['join']); $i++){
+        $sql .=  " ".$data['join'][$i][0]." ".$data['join'][$i][1]." ON ".$data['join'][$i][2]." ".$data['join'][$i][3]." ".$data['join'][$i][4];
+      }
+    }
+    return $sql;
+  }
+  private function buildWhere($data){
+    $sql = "";
+    if(isset($data['where'])){
+      for($i = 0; $i < sizeof($data['where']); $i++){
+        if($i == 0){
+          $sql .= " WHERE";
+        }
+        if(isset($data['where'][$i]['pre'])){
+          $sql .= " ".$data['where'][$i]['pre']." ";
+        }
+        $sql .= " ".implode(" ", $data['where'][$i]);
+        if(isset($data['where'][$i]['post'])){
+          $sql .= " ".$data['where'][$i]['post']." ";
+        }
+      }
+    }
+    return $sql;
+  }
+  private function buildGroupBy($data){
+    $sql = "";
+    if(isset($data['groupBy'])){
+      $sql .= " GROUP BY ".implode(", ", $data['groupBy']);
+      //having
+      if(isset($data['having'])){
+        for($i = 0; $i < sizeof($data['having']); $i++){
+          if($i == 0){
+            $sql .= " HAVING";
+          }
+          if(isset($data['having'][$i]['pre'])){
+            $sql .= " ".$data['having'][$i]['pre']." ";
+          }
+          $sql .= " ".implode(" ", $data['having'][$i]);
+          if(isset($data['having'][$i]['post'])){
+            $sql .= " ".$data['having'][$i]['post']." ";
+          }
+        }
+      }
+    }
+    return $sql;
+  }
+  private function buildOrderBy($data){
+    $sql = "";
+    //orderBy
+    if(isset($data['orderBy'])){
+      $sql .= " ORDER BY ".implode(", ", $data['orderBy']);
+    }
+    return $sql;
+  }
 
-			}
-		}
-		return $this;
-	}
-	public function insert(){
-		/*
-		Metodo insert
-		ha un numero infinito di argomenti
-		setta l'attributo into con il primo argomento ricevuto, e aggiunge all'atributo insert gli altri argomenti
-		*/
-		$arg = func_get_args();
+  public function insert(){
+    $arg = func_get_args();
+    $this->sql[]['insert'] = ['table' => [], 'field' => []];
+    $this->countSql++;
 		if(sizeof($arg) > 0){
-			$this->into = $arg[0];
-		}else{
-			array_push($this->error, "Table non settata nell'INSERT");
+			$this->sql[$this->countSql]['insert']['table'] = $arg[0];
 		}
 		if(sizeof($arg) > 0){
 			for($i = 1; $i < sizeof($arg); $i++){
-				array_push($this->insert, $arg[$i]);
+        array_push($this->sql[$this->countSql]['insert']['field'], $arg[$i]);
 			}
-		}else{
-			array_push($this->error, "Campi non settati nell'INSERT");
 		}
 		return $this;
 	}
-	public function value(){
-		/*
-		Metodo value
-		ha infiniti argomenti
-		aggiunge all'atributo value un array contenente tutti gli argomenti ricevuti in iput
-		*/
-		$value = func_get_args();
-		$v = [];
-		foreach($value as $vv){
-			$a = $this->haveErrorChar($vv);
-			if($a == false && $a != 0){
-				array_push($this->error, "Errore nel campo del VALUE");
-				return $this;
-			}else{
-				if(gettype($a) == 'string'){
-					$a = "'".$a."'";
-				}
-				array_push($v, $a);
-			}
-		}
-		array_push($this->value, $v);
-		return $this;
+  public function value(){
+    $value = func_get_args();
+    if(isset($value[0]) && $value[0] instanceof ZDatabase){
+      $a = $this->sql[$this->countSql];
+      unset($this->sql[$this->countSql]);
+      $this->countSql--;
+    }else{
+      $a = [];
+      foreach($value as $v){
+        $b = $this->haveErrorChar($v);
+  			if($b == false && $b != 0){
+  				return $this;
+  			}else{
+  				if(gettype($b) == 'string'){
+  					$b = "'".$b."'";
+  				}elseif(!isset($b)){
+            $b = "NULL";
+          }
+  			}
+        $a[] = $b;
+      }
+    }
+    $this->sql[$this->countSql]['value'] = $a;
+    return $this;
 	}
+
+  private function buildQueryInsert($data){
+    $sql = $this->buildInsert($data);
+    $sql = $this->buildValue($data);
+    return $sql;
+  }
+  private function buildInsert($data){
+    $sql = "INSERT INTO ".$data['insert']['table'];
+    if(sizeof($data['insert']['field']) > 0){
+      $sql .= " (".implode(", ", $data['insert']['field']).")";
+    }
+    return $sql;
+  }
+  private function buildValue($data){
+    $sql = " VALUES(";
+    if(isset($data['value']['select'])){
+      $sql .= $this->buildSelect($data['value']);
+    }else{
+      $sql .= implode(", ", $data['value']);
+    }
+    $sql .= ")";
+    return $sql;
+  }
+
 	public function update($table){
-		/*
-		Metodo update
-		ha un argomento
-		setta l'attributo update con l'argomento ricevuto in input
-		*/
-		$this->update = $table;
+    $this->sql[]['update'] = $table;
+    $this->countSql++;
 		return $this;
 	}
 	public function set($field, $value){
-		/*
-		Metodo updsetate
-		ha due argomenti
-		aggiunge all'attributo set un array contenente gli argomenti ricevuti in input
-		*/
-
 		$f = $this->haveErrorChar($field);
-		if($f == false && $f != 0){
-			array_push($this->error, "Errore nel campo del SET");
-			return $this;
-		}else{
-			$v = $this->haveErrorChar($value);
-			if($v == false && $v != 0){
-				array_push($this->error, "Errore nel valore del SET");
-				return $this;
-			}else{
-				if(gettype($v) == 'string'){
-					$v = "'".$v."'";
-				}
-				array_push($this->set, [$f, $v]);
-				return $this;
-			}
-		}
-	}
-  public function delete(){
-    /*
-    Metodo delete
-    non ha argomenti
-    setta la query come delete
-    */
-    $this->delete = true;
-    return $this;
-  }
-	public function getSQL(){
-		/*
-		Metodo getSQL
-		non ha argomenti
-		crea la sql partento dagli attributi della classe, e li azzera prima di ritorna la sql
-		*/
-		if(sizeof($this->error) > 0){
-			throw new DataException("There is some error", $this->error);
-		}else{
-			$sql = "";
-			if(sizeof($this->select) > 0){
-				if(sizeof($this->from) > 0){
-					$sql = "SELECT ".($this->distinct ? "DISTINCT " : "").implode(", ", $this->select)." FROM ";
-					for($i = 0; $i < sizeof($this->from); $i++){
-						$sql .=  $this->from[$i];
-						if($i < sizeof($this->from) - 1){
-							$sql .= " ,";
-						}
-					}
-					if(sizeof($this->join)){
-						for($i = 0; $i < sizeof($this->join); $i++){
-							$sql .=  " ".$this->join[$i][0]." ".$this->join[$i][1]." ON ".$this->join[$i][2]." ".$this->join[$i][3]." ".$this->join[$i][4];
-						}
-					}
-					if(sizeof($this->where) > 0){
-						for($i = 0; $i < sizeof($this->where); $i++){
-							if($i == 0){
-								$sql .= " WHERE";
-							}
-							$sql .= " ".implode(" ", $this->where[$i]);
-							if($i < sizeof($this->where) - 1){
-								$sql .= " AND";
-							}
-						}
-					}
-					if(sizeof($this->groupBy)){
-						for($i = 0; $i < sizeof($this->groupBy); $i++){
-							if($i == 0){
-								$sql .= " GROUP BY";
-							}
-							$sql .=  " ".$this->groupBy[$i];
-							if($i < sizeof($this->groupBy) - 1){
-								$sql .= ",";
-							}
-						}
-						if(sizeof($this->having) > 0){
-							for($i = 0; $i < sizeof($this->having); $i++){
-								if($i == 0){
-									$sql .= " HAVING";
-								}
-								$sql .= " ".implode(" ", $this->having[$i]);
-								if($i < sizeof($this->having) - 1){
-									$sql .= " AND";
-								}
-							}
-						}
-					}
-					if(sizeof($this->orderBy)){
-						for($i = 0; $i < sizeof($this->orderBy); $i++){
-							if($i == 0){
-								$sql .= " ORDER BY";
-							}
-							$sql .=  " ".$this->orderBy[$i];
-							if($i < sizeof($this->orderBy) - 1){
-								$sql .= ",";
-							}
-						}
-					}
-				}else{
-					trigger_error("FROM non settato", E_USER_ERROR);
-					exit();
-				}
-			}else if(sizeof($this->insert) > 0 && sizeof($this->value) > 0){
-				$sql = "INSERT INTO ".$this->into;
-				for($i = 0; $i < sizeof($this->insert); $i++){
-					if($i == 0){
-						$sql .= " (";
-					}
-					$sql .= $this->insert[$i].", ";
-					if($i == sizeof($this->insert)-1){
-						$sql = substr($sql, 0, strlen($sql)-2).")";
-					}
-				}
-				$sql .= " VALUES ";
-				for($i = 0; $i < sizeof($this->value); $i++){
-					$sql .= "(";
-					for($k = 0; $k < sizeof($this->value[$i]); $k++){
-            if(!isset($this->value[$i][$k])){
-              $sql .= "null";
-            }else{
-              $sql .= $this->value[$i][$k];
-            }
-						if($k != sizeof($this->value[$i]) - 1){
-							$sql .= ", ";
-						}
-					}
-					$sql .= ")";
-					if($i != sizeof($this->value) - 1){
-						$sql .= ", ";
-					}
-				}
-			}else if(sizeof($this->update) > 0 && sizeof($this->set) > 0){
-				$sql = "UPDATE ".$this->update." SET";
-				for($i = 0; $i < sizeof($this->set); $i++){
-          if(!isset($this->set[$i][2])){
-            $this->set[$i][2] = "null";
-          }
-					$sql .= " ".implode(" = ", $this->set[$i]);
-					if($i != sizeof($this->set) - 1){
-						$sql .= ", ";
-					}
-				}
-				if(sizeof($this->where) > 0){
-					for($i = 0; $i < sizeof($this->where); $i++){
-						if($i == 0){
-							$sql .= " WHERE";
-						}
-						$sql .= " ".implode(" ", $this->where[$i]);
-						if($i < sizeof($this->where) - 1){
-							$sql .= " AND";
-						}
-					}
-				}
-			}elseif($this->delete){
-        $sql = "DELETE FROM ";
-        for($i = 0; $i < sizeof($this->from); $i++){
-          $sql .=  $this->from[$i];
-          if($i < sizeof($this->from) - 1){
-            $sql .= " ,";
-          }
-        }
-        if(sizeof($this->where) > 0){
-					for($i = 0; $i < sizeof($this->where); $i++){
-						if($i == 0){
-							$sql .= " WHERE";
-						}
-						$sql .= " ".implode(" ", $this->where[$i]);
-						if($i < sizeof($this->where) - 1){
-							$sql .= " AND";
-						}
-					}
-				}
-			}else{
-        //possibile ??
+    $v = $this->haveErrorChar($value);
+		if(!($f == false && $f != 0 && $v == false && $v != 0)){
+			if(gettype($v) == 'string'){
+				$v = "'".$v."'";
+			}elseif(!isset($v)){
+        $v = "NULL";
       }
-			$this->select = [];
-			$this->distinct = false;
-			$this->from = [];
-			$this->where = [];
-			$this->groupBy = [];
-			$this->having = [];
-			$this->orderBy = [];
-			$this->join = [];
-			$this->error = [];
-			$this->insert = [];
-			$this->into = "";
-			$this->value = [];
-			$this->update = "";
-			$this->set = [];
-      $this->delete = false;
-			return $sql;
+      if(!isset($this->sql[$this->countSql]['set'])){
+        $this->sql[$this->countSql]['set'] = [];
+      }
+			array_push($this->sql[$this->countSql]['set'], [$f, $v]);
+			return $this;
 		}
 	}
-	public function execute($beforeExecute = null, $afterExecute = null){
-		/*
+
+  private function buildQueryUpdate($data){
+    $sql = $this->buildUpdate($data);
+    $sql .= $this->buildSet($data);
+    $sql .= $this->buildWhere($data);
+    return $sql;
+  }
+  private function buildUpdate($data){
+    return "UPDATE ".$data['update'];
+  }
+  private function buildSet($data){
+    $sql = " SET ";
+    foreach($data['set'] as $v){
+      $sql .= implode(" = ", $v).", ";
+    }
+    return substr($sql, 0, -2);
+  }
+
+  public function delete(){
+    $arg = func_get_args();
+    $this->sql[]['delete'] = ['table' => []];
+    $this->countSql++;
+		if(sizeof($arg) > 0){
+			$this->sql[$this->countSql]['delete']['table'] = $arg[0];
+		}
+		return $this;
+  }
+
+  private function buildQueryDelete($data){
+    $sql = $this->buildDelete($data);
+    $sql .= $this->buildWhere($data);
+    return $sql;
+  }
+  private function buildDelete($data){
+    return "DELETE FROM ".$data['delete']['table'];
+  }
+
+  public function execute($beforeExecute = null, $afterExecute = null){
+    /*
 		Metodo execute
 		non ha argomenti
 		richiama il metodo getSQL e executeSql passandogli la sql creata
 		*/
 		$sql = "";
 		try{
-			$sql = $this->getSQL();
+			$sql = $this->build();
 			return $this->executeSql($sql, $beforeExecute, $afterExecute);
 		}catch(Exception $e){
-			/*
-			possibile log
-			d_var_dump($e);
-			*/
 		}
 	}
 	private function haveErrorChar($str){
@@ -569,17 +454,13 @@ class ZDatabase{
     }else{
       $this->beforeExecute($sql);
     }
-    $result = $this->obj->query($sql);
+    $result = $this->query($sql);
     if(isset($afterExecute)){
-      call_user_func_array($afterExecute, [$sql, $result, $this->obj->affected_rows]);
+      call_user_func_array($afterExecute, [$sql, $result, $this->affected_rows]);
     }else{
-      $this->afterExecute($sql, $result, $this->obj->affected_rows);
+      $this->afterExecute($sql, $result, $this->affected_rows);
     }
-    if($result == false){
-      $l = new ZLogger();
-      $l->error("Database return false on following query", $sql);
-    }
-		$resultset = array();
+		$resultset = [];
 		if(substr($sql, 0, 6) == "SELECT"){
       if($result->num_rows > 0){
   			$fields = $result->field_count;
@@ -595,6 +476,6 @@ class ZDatabase{
 		}else{
 			return $result;
 		}
-    }
+  }
 }
 ?>
