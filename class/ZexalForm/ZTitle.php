@@ -3,7 +3,10 @@ class ZTitle{
 
   protected $content;
 
-  public function __construct($title, $desc = ""){
+  public function __construct($title, $desc = null){
+    if(!isset($desc)){
+      $desc = "";
+    }
     $this->content = [
       "data-titolo" => $title,
       "data-descrizione" => $desc
