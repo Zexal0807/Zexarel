@@ -9,7 +9,7 @@ abstract class ZQuestion{
       "data-domanda" => $domanda,
       "data-descrizione" => $descrizione,
       "data-required" => boolval($obbligatoria),
-      "data-valid" => (isset($req) ? $req : (boolval($obbligatoria) ? ".*" : ""))
+      "data-valid" => (isset($req) ? $req : (boolval($obbligatoria) ? ".{1,}" : ".*"))
 		];
   }
 
