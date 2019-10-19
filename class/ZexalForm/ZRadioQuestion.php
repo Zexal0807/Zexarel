@@ -12,11 +12,11 @@ class ZRadioQuestion extends ZQuestion{
     $html .= '<div class="question-radio">';
     foreach($this->data as $k => $v){
       $html .='<div class="radio-option">
-      <div class="outer-radio">
-        <div class="inner-radio"></div>
-      </div>
-      <div class="radio-desc">'.$v.'</div>
-      <input class="anser" type="radio" name="'.$this->content['name'].'" value="'.$k.'">
+        <div class="outer-radio">
+          <div class="inner-radio"></div>
+        </div>
+        <div class="radio-desc">'.$v.'</div>
+        <input class="anser" type="radio" name="'.$this->content['name'].'" value="'.$k.'">
       </div>';
     }
     $html .= '</div>'.$this->getPostHtml();
