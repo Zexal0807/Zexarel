@@ -1,4 +1,6 @@
 <?php
+include("Zexarel/class/ZSession/DatabaseSession.php");
+include("Zexarel/class/ZSession/SessionHandle.php");
 class ZSession{
   public static function start(){
     $session = new SessionHandle();
