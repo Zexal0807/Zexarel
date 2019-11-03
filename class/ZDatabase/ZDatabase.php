@@ -324,7 +324,7 @@ class ZDatabase extends mysqli{
 
   private function buildQueryInsert($data){
     $sql = $this->buildInsert($data);
-    $sql = $this->buildValue($data);
+    $sql .= $this->buildValue($data);
     return $sql;
   }
   private function buildInsert($data){
@@ -412,6 +412,7 @@ class ZDatabase extends mysqli{
 		$sql = "";
 		try{
 			$sql = $this->build();
+      d_var_dump($sql);
 			return $this->executeSql($sql, $beforeExecute, $afterExecute);
 		}catch(Exception $e){
 		}
@@ -473,9 +474,21 @@ class ZDatabase extends mysqli{
   			}
       }
       return [];
-		}else{
+		}elseif(substr($sql, 0, 6) == "INSERT"){
+      if($result){
+        return $this->insert_id;
+      }else{
+        return false;
+      }
+    }else{
 			return $result;
 		}
   }
+
+  public function execFromArray($arr, $beforeExecute = null, $afterExecute = null){
+    $this->sql[] = $arr;
+    return $this->execute($beforeExecute, $afterExecute);
+  }
+
 }
 ?>

@@ -1,6 +1,6 @@
 {
 	"name" : "Zexarel",
-	"version" : "1.3.5",
+	"version" : "1.3.6",
 	"require" : {
 		"function" : {
 			"find" : "find.php",
@@ -37,10 +37,7 @@
 			"ZView" : {
 				"ZBladeCompiler" : "ZBladeCompiler.php",
 				"ZView" : "ZView.php",
-				"ZModel" : "ZModel.php"
-			},
-			"ZDownloader" : {
-				"ZDownloader" : "ZDownloader.php"
+				"ZModel" : "ZHtmlModel.php"
 			}
 		}
 	}

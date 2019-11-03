@@ -1,5 +1,5 @@
 <?php
-class ZModel{
+class ZHtmlModel{
 	protected $dir = "model/";			//string, directory del modello
 	protected $name = "model";			//string, nome del modello
 	private $property;					//array, contiene gli attributi della classe
