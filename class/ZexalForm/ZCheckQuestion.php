@@ -16,7 +16,7 @@ class ZCheckQuestion extends ZQuestion{
         <div class="inner-check"></div>
       </div>
       <div class="check-desc">'.$v.'</div>
-      <input class="anser" type="checkbox" name="'.$this->content['name'].'" value="'.$k.'">
+      <input class="anser" type="checkbox" name="'.$this->content['name'].'[]" value="'.$k.'">
       </div>';
     }
     $html .= '</div>'.$this->getPostHtml();

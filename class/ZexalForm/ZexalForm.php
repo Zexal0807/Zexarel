@@ -38,7 +38,7 @@ class ZexalForm{
   }
 
   public function getHtml(){
-    $html = '<form class="zexal-form" ';
+    $html = '<form class="zexal-form" enctype="multipart/form-data"';
     foreach($this->content['data'] as $k => $v){
       if(find("data", $v) < 0){
         $html .= $k.'="'.$v.'"';
