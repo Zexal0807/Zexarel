@@ -11,13 +11,28 @@ $(document).ready(function(){
 		var vi = true;
 		$.each(d, function(k, v){
 			if(!isValid(v)){
+				if(vi){
+					$([document.documentElement, document.body]).animate({
+			      scrollTop: $(v).parents('.section-question').offset().top - 15
+			    }, 2000);
+				}
 				vi = false;
 			}
 		});
 		if(vi){
-			var n = parseInt($(this).attr("data-section"));
-			$('#FORMID .carousel').carousel(n);
-			visitedSection.push(n);
+			var n = $(this).attr("data-section");
+			if(n == "submit"){
+					$('#FORMID')[0].submit();
+			}else{
+				if(n == parseInt(n)){
+					n = parseInt(n);
+				}else{
+					n = new Function(n)();
+					n = n()//eval(n);
+				}
+				$('#FORMID .carousel').carousel(n);
+				visitedSection.push(n);
+			}
 		}
 	});
 
@@ -45,7 +60,8 @@ $(document).ready(function(){
 	});
 
 	$('#FORMID input[type=tel]').on("keydown keyup key", function(e){
-		if(!(e.key >= "0" && e.key <= "9")){
+		debugger;
+		if(!(e.key >= "0" && e.key <= "9" && e.key == "Backspace" && e.key == "Delete")){
 			e.preventDefault();
 		}
 	});
@@ -76,7 +92,7 @@ $(document).ready(function(){
 			case "radio":
 			case "checkbox":
 				if(reg != "/.*/"){
-					if($('#FORMID input[name='+$(obj).attr("name")+']:checked').lenght != 0){
+					if($('#FORMID input[name='+$(obj).attr("name")+']:checked').length != 0){
 						var o = $(obj).parents('.section-question');
 						if($(o).hasClass('error')){
 							$(o).removeClass('error');
@@ -96,6 +112,25 @@ $(document).ready(function(){
 			case "file":
 				if(reg != "/.*/"){
 					if($('#FORMID input[name='+$(obj).attr("name")+']')[0].files.length != 0){
+						var o = $(obj).parents('.section-question');
+						if($(o).hasClass('error')){
+							$(o).removeClass('error');
+						}
+						return true;
+					}else{
+						var o = $(obj).parents('.section-question');
+						if(!$(o).hasClass('error')){
+							$(o).addClass('error');
+						}
+						return false;
+					}
+				}else{
+					return true;
+				}
+				break;
+			case "date":
+				if(reg != "/.*/"){
+					if($('#FORMID input[name='+$(obj).attr("name")+']').val() != ""){
 						var o = $(obj).parents('.section-question');
 						if($(o).hasClass('error')){
 							$(o).removeClass('error');

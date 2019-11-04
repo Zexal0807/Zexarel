@@ -1,7 +1,9 @@
 <?php
 include("Zexarel/class/ZexalForm/ZTitle.php");
+include("Zexarel/class/ZexalForm/ZSubTitle.php");
 include("Zexarel/class/ZexalForm/ZQuestion.php");
 include("Zexarel/class/ZexalForm/ZTextQuestion.php");
+include("Zexarel/class/ZexalForm/ZDateQuestion.php");
 include("Zexarel/class/ZexalForm/ZNumberQuestion.php");
 include("Zexarel/class/ZexalForm/ZEmailQuestion.php");
 include("Zexarel/class/ZexalForm/ZPhoneQuestion.php");
