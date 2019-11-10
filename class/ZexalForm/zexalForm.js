@@ -2,6 +2,8 @@ $(document).ready(function(){
 	$('head').append('<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">');
 	$('head').append('<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"><\/script>');
 	$('head').append('<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"><\/script>');
+	$('head').append('<script src="Zexarel/class/ZexalForm/cleave.min.js"><\/script>');
+	$('head').append('<script src="Zexarel/class/ZexalForm/cleave-phone.it.js"><\/script>');
 	$('head').append('<link rel="stylesheet" type="text/css" href="Zexarel/class/ZexalForm/zexalForm.css">');
 
 	var visitedSection = [0];
@@ -28,7 +30,7 @@ $(document).ready(function(){
 					n = parseInt(n);
 				}else{
 					n = new Function(n)();
-					n = n()//eval(n);
+					n = n();
 				}
 				$('#FORMID .carousel').carousel(n);
 				visitedSection.push(n);
@@ -60,9 +62,20 @@ $(document).ready(function(){
 	});
 
 	$('#FORMID input[type=tel]').on("keydown keyup key", function(e){
-		debugger;
-		if(!(e.key >= "0" && e.key <= "9" && e.key == "Backspace" && e.key == "Delete")){
+		if(!(e.key == "Backspace" || e.key == "Delete" || (e.key >= "0" && e.key <= "9"))){
 			e.preventDefault();
+		}
+	});
+
+	$('#FORMID input').on("keydown keyup key", function(e){
+		debugger;
+		var a = $(this).parents('.section-question').attr('data-length');
+		if(a != -1){
+			if($(this).val().length >= a){
+				if(!(e.key == "Backspace" || e.key == "Delete")){
+					e.preventDefault();
+				}
+			}
 		}
 	});
 

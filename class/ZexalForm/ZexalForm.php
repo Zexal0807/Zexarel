@@ -9,6 +9,7 @@ include("Zexarel/class/ZexalForm/ZEmailQuestion.php");
 include("Zexarel/class/ZexalForm/ZPhoneQuestion.php");
 include("Zexarel/class/ZexalForm/ZRadioQuestion.php");
 include("Zexarel/class/ZexalForm/ZCheckQuestion.php");
+include("Zexarel/class/ZexalForm/ZCleaveQuestion.php");
 include("Zexarel/class/ZexalForm/ZFileQuestion.php");
 include("Zexarel/class/ZexalForm/ZButton.php");
 class ZexalForm{
@@ -63,7 +64,7 @@ class ZexalForm{
 		</form>';
 		$js = file_get_contents("Zexarel/class/ZexalForm/zexalForm.js");
 		$js = str_replace("#FORMID", "#".$this->content['data']['id'], '<script>'.$js.'</script>');
-		$html .= $js;
+		$html = $js.$html;
     return $html;
   }
 

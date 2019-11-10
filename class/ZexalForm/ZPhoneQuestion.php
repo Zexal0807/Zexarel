@@ -2,7 +2,7 @@
 class ZPhoneQuestion extends ZQuestion{
 
   public function __construct($name, $domanda, $descrizione, $obbligatoria){
-    parent::__construct($name, $domanda, $descrizione, $obbligatoria, "([\+]\d{2})?([\ ])?\d{8,10}");
+    parent::__construct($name, $domanda, $descrizione, $obbligatoria, null, 10);
   }
 
   public function getHtml(){

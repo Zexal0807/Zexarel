@@ -3,13 +3,14 @@ abstract class ZQuestion{
 
   protected $content;
 
-  public function __construct($name, $domanda, $descrizione, $obbligatoria, $req = null){
+  public function __construct($name, $domanda, $descrizione, $obbligatoria, $req = null, $length = null){
     $this->content = [
       "name" => $name,
       "data-domanda" => $domanda,
       "data-descrizione" => $descrizione,
       "data-required" => boolval($obbligatoria),
-      "data-valid" => (isset($req) ? $req : (boolval($obbligatoria) ? ".{1,}" : ".*"))
+      "data-valid" => (isset($req) ? $req : (boolval($obbligatoria) ? ".{1,}" : ".*")),
+      "data-length" => (isset($length) ? $length : -1)
 		];
   }
 
@@ -35,6 +36,7 @@ abstract class ZQuestion{
     '</div>';
     return $html;
   }
+
   abstract function getHtml();
 
 }
