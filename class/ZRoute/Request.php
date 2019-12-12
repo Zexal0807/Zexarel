@@ -1,5 +1,6 @@
 <?php
 class Request{
+	private $ip;
 	private $url;
 	private $method;
 	private $parameter;
@@ -32,6 +33,7 @@ class Request{
 		}
 		$this->cookie = $_COOKIE;
 		$this->files = $_FILES;
+		$this->ip = (!empty($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'] ));
 	}
 	public function getUrl(){
 		return $this->url;
@@ -65,6 +67,9 @@ class Request{
 			return $this->files[$name];
 		}
 		return "";
+	}
+	public function getIp(){
+		return $this->ip;
 	}
 }
 ?>
