@@ -567,6 +567,11 @@ class ZPdf{
     $this->addText($x, $y, $txt);
     $this->rotate(0);
   }
+	public function addRotatedImage($file, $x, $y, $w, $h, $angle){
+    $this->rotate($angle, $x, $y);
+    $this->addImage($file, $x, $y, $w, $h);
+    $this->rotate(0);
+	}
 
 	public function getAutoPageBreak(){
 		// Accept automatic page break or not
