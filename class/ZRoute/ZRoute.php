@@ -3,7 +3,7 @@ class ZRoute{
 	private static $_route = [];
 	public static function __callStatic($name, $arg){
 		if(in_array(strtoupper($name), ["GET", "POST", "PUT", "DELETE", "HEAD"])){
-			ZRoute::$_route[] = new Route(strtoupper($name), trim($arg[0], '/\^$'), $arg[1], (isset($arg[2]) ? $arg[2] : null));
+			ZRoute::$_route[] = new Route(strtoupper($name), $arg[0], $arg[1], (isset($arg[2]) ? $arg[2] : null));
 		}
 	}
 	public static function getUri($name){

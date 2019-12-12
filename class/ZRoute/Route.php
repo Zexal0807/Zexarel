@@ -9,27 +9,8 @@ class Route{
 	public function __construct($method, $url, $callback, $name = null){
 		$this->method = $method;
 		$this->url = $url;
-		$p = explode("/", $this->url);
-		$this->pattern = "";
-		$f = false;
-		for($i = 0; $i < sizeof($p); $i++){
-			if(preg_match('/\<+[a-zA-Z0-9]*+\>/', $p[$i])){
-				if($f){
-					$this->pattern .= "+\/";
-				}
-				$f = true;
-				$this->pattern .= '+[a-zA-Z0-9]*';
-				$this->parameter[] = $p[$i];
-			}elseif(preg_match('/\\[+[a-zA-Z0-9]*+\]/', $p[$i])){
-				$this->pattern .= "+(\/+".str_replace(["[", "]"], "", $p[$i]).')?';
-			}else{
-				if($f){
-					$this->pattern .= "+\/";
-				}
-				$this->pattern .= $p[$i];
-				$f = true;
-			}
-		}
+		$this->parameter = [];
+		$this->pattern = RoutePatternCreator::create($this->url, $this->parameter);
 		$this->callback = $callback;
 		$this->name = $name;
 	}
@@ -67,6 +48,10 @@ class Route{
 				if($req->getMethod() == "HEAD"){
 					ob_end_clean();
 				}
+			/*	if(ZexalViewStatistics::$started){
+					$zvs = new ZexalViewStatistics($req);
+					d_var_dump($zvs);
+				}*/
 				return true;
 			}
 		}
