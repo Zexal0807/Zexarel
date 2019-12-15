@@ -1,21 +1,23 @@
 <?php
 class ZBladeCompiler{
 
+	private static $CHAR = '[a-zA-Z0-9àèéìòù\s\-\_\(\)\:\=\<\>\;\,\.\?\$\"\'\[\]]*(\n)?';
+
 	private static $search = [
-		'/\{+\{+\{([a-zA-Z0-9àèéìòù\s-_():=>;\,\.$\"\'\[\]]*(\n)?)\}+\}+\}/',
-		'/\{+\{([a-zA-Z0-9àèéìòù\s-_():>;\,\.$"\'\[\]]*(\n)?)\}+\}/',
-		'/\{+\-+\-([a-zA-Z0-9àèéìòù\s-_():>;\.$"\'\[\]]*(\n)?)\-+\-+\}/',
-		'/\@if\(([a-zA-Z0-9*$\s=>\.<()+*\/%\-\"\'\[\]]*)\)/',
-		'/\@elseif\(([a-zA-Z0-9*$\s=>\.<()+*\/%\-"\'\[\]]*)\)/',
-		'/\@foreach\(([a-zA-Z0-9*$\s=>\.<()+*\/%\-"\'\[\]]*)\)/',
-		'/\@for\(([a-zA-Z0-9*$\s=>\.<()+*\/%\-"\'\[\]\;]*)\)/',
-		'/\@while\(([a-zA-Z0-9*$\s=>\.<()+*\/%\-"\'\[\]]*)\)/',
-		'/\@enddowhile\(([a-zA-Z0-9*$\s=>\.<()+*\/%\-"\'\[\]]*)\)/',
+		'/\{+\{+\{($CHAR)\}+\}+\}/',
+		'/\{+\{($CHAR)\}+\}/',
+		'/\{+\-+\-($CHAR)\-+\-+\}/',
+		'/\@if\(($CHAR)\)/',
+		'/\@elseif\(($CHAR)\)/',
+		'/\@foreach\(($CHAR)\)/',
+		'/\@for\(($CHAR)\)/',
+		'/\@while\(($CHAR)\)/',
+		'/\@enddowhile\(($CHAR)\)/',
 		'/\@dowhile/',
 		'/\@else/',
 		'/\@endif/',
-		'/\@endfor/',
 		'/\@endoforeach/',
+		'/\@endfor/',
 		'/\@endwhile/'
 	];
 
@@ -39,7 +41,7 @@ class ZBladeCompiler{
 
 	public static function compile($str, $data = null){
 		for($i = 0; $i < sizeof(static::$search); $i++){
-			$str = preg_replace(static::$search[$i], static::$replace[$i], $str);
+			$str = preg_replace(str_replace('$CHAR', static::$CHAR, static::$search[$i]), static::$replace[$i], $str);
 		}
 		ob_start();
 		if(sizeof($data) > 0){
