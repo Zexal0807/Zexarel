@@ -144,11 +144,7 @@ class ZPdf{
 		$this->hPt = $this->h*$this->k;
 
 		// Font path
-		if(is_dir(dirname(__FILE__).'/ZpdfFont')){
-			$this->fontpath = dirname(__FILE__).'/ZpdfFont//';
-		}else{
-			$this->fontpath = '';
-    }
+		$this->fontpath = dirname(__FILE__).'/ZPdfFont//';
 
 		// Core fonts
 		$this->CoreFonts = array('courier', 'helvetica', 'times', 'symbol', 'zapfdingbats');
