@@ -30,7 +30,7 @@ class Route{
 				$arr["_COOKIE"] = $req->getCookies();
 				$arr["_FILES"] = $req->getFiles();
 				if($this->url != $req->getUrl()){
-					$f = explode("/", $this->url);
+					$f = explode("/", substr($this->url, 1));
 					$r = explode("/", $req->getUrl());
 					for($i = 0, $k = 0; $i < sizeof($r); $i++, $k++){
 						if($r[$i] == $f[$k]){
@@ -48,10 +48,6 @@ class Route{
 				if($req->getMethod() == "HEAD"){
 					ob_end_clean();
 				}
-			/*	if(ZexalViewStatistics::$started){
-					$zvs = new ZexalViewStatistics($req);
-					d_var_dump($zvs);
-				}*/
 				return true;
 			}
 		}
