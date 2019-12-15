@@ -16,10 +16,11 @@ class ZDatabase extends mysqli{
     "<=",
     "LIKE",
     "<>",
+    "!=",
     "IN",
     "BETWEEN",
-    "IS NULL",
-    "IS NOT NULL"];
+    "IS",
+    "IS NOT"];
 
 	public function __construct() {
     if(!isset($this->host)){
@@ -138,14 +139,6 @@ class ZDatabase extends mysqli{
   }
 	public function innerJoin($table, $on, $operator, $compare = null){
     if(in_array($operator, ZDatabase::$operator)){
-      if(isset($compare)){
-        $compare = $this->haveErrorChar($compare);
-      }
-      if(gettype($compare) == 'string'){
-        $compare = "'".$compare."'";
-      }elseif(!isset($compare)){
-        $compare = "NULL";
-      }
       if(!isset($this->sql[$this->countSql]['join'])){
         $this->sql[$this->countSql]['join'] = [];
       }
@@ -155,14 +148,6 @@ class ZDatabase extends mysqli{
 	}
 	public function leftJoin($table, $on, $operator, $compare = null){
     if(in_array($operator, ZDatabase::$operator)){
-      if(isset($compare)){
-        $compare = $this->haveErrorChar($compare);
-      }
-      if(gettype($compare) == 'string'){
-        $compare = "'".$compare."'";
-      }elseif(!isset($compare)){
-        $compare = "NULL";
-      }
       if(!isset($this->sql[$this->countSql]['join'])){
         $this->sql[$this->countSql]['join'] = [];
       }
@@ -172,14 +157,6 @@ class ZDatabase extends mysqli{
 	}
 	public function rightJoin($table, $on, $operator, $compare = null){
     if(in_array($operator, ZDatabase::$operator)){
-      if(isset($compare)){
-        $compare = $this->haveErrorChar($compare);
-      }
-      if(gettype($compare) == 'string'){
-        $compare = "'".$compare."'";
-      }elseif(!isset($compare)){
-        $compare = "NULL";
-      }
       if(!isset($this->sql[$this->countSql]['join'])){
         $this->sql[$this->countSql]['join'] = [];
       }
@@ -199,7 +176,7 @@ class ZDatabase extends mysqli{
     }elseif(isset($this->sql[0]['delete'])){
       $sql = $this->buildQueryDelete($this->sql[0]);
     }
-    unset($this->sql[0]);
+    $this->sql[0] = [];
     $this->countSql = 0;
     return $sql;
   }
@@ -412,7 +389,6 @@ class ZDatabase extends mysqli{
 		$sql = "";
 		try{
 			$sql = $this->build();
-      d_var_dump($sql);
 			return $this->executeSql($sql, $beforeExecute, $afterExecute);
 		}catch(Exception $e){
 		}
@@ -489,6 +465,5 @@ class ZDatabase extends mysqli{
     $this->sql[] = $arr;
     return $this->execute($beforeExecute, $afterExecute);
   }
-
 }
 ?>
