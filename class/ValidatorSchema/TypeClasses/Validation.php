@@ -5,13 +5,11 @@ class Validation {
     $this->validator = $validator;
   }
 
-  public function validate($datatype) {
-    if ($datatype != "boolean"){
-      if ($this->validator->isBlank()) {
-        return false;
-      }
+  public function validate() {
+    if ($this->validator->isBlank()) {
+      return false;
     }
     return $this->validator->validateType();
   }
-  
+
 }
