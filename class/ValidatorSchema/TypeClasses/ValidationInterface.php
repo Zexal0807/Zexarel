@@ -1,4 +1,4 @@
 <?php
-interface TypeCheck {
+interface ValidationInterface {
   public function validateType();
 }
