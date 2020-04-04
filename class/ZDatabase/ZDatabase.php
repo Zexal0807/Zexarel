@@ -176,8 +176,8 @@ class ZDatabase extends mysqli{
     }elseif(isset($this->sql[0]['delete'])){
       $sql = $this->buildQueryDelete($this->sql[0]);
     }
-    $this->sql[0] = [];
-    $this->countSql = 0;
+    $this->sql = [];
+    $this->countSql = -1;
     return $sql;
   }
   private function buildQuerySelect($data){
