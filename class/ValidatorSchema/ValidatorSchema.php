@@ -1,72 +1,65 @@
 <?php
-require("TypeClasses\ValidationInterface.php");
-
-require("TypeClasses\Constraints.php");
-
-require("TypeClasses\TypeBool.php");
-require("TypeClasses\TypeText.php");
-require("TypeClasses\TypeNumeric.php");
-require("TypeClasses\TypeDate.php");
-
-require("TypeClasses\Validation.php");
+require_once("TypeBool.php");
+require_once("TypeText.php");
+require_once("TypeNumeric.php");
 
 class ValidatorSchema {
 
-  private $error_nodes = [];
-
   public $validated = true;
 
-  public function validate($schema, $json_payload) {
+  public function validate($schema, $data) {
     if (!is_array($schema)) {
-      return false;
+      $this->validated = false;
+      return $this->validated;
     }
-    $this->recursive_walk($schema, $json_payload);
+    foreach ($schema as $value) {
+      $this->recursive_walk($value, $data);
+    }
     return $this->validated;
   }
 
-  private function recursive_walk($schema, $json_payload) {
-    foreach ($schema as $nodes => $value) {
-      $type = isset($value['type']) ? $value['type'] : 'object';
-
-      $val = false;
-
-      if (!isset($json_payload[$value['name']])) {
-        $this->error_nodes[] = sprintf("'%s' does not exists.", $value['name']);
-        $this->validated = false;
-        return;
-      }
-
-      switch ($value['type']) {
-        case 'text':
-          $this->validated = (new Validation(new TypeText($value, $json_payload[$value['name']])))->validate();
-          break;
-        case 'numeric':
-          $this->validated = (new Validation(new TypeNumeric($value, $json_payload[$value['name']])))->validate();
-          break;
-        case 'boolean':
-          $this->validated = (new Validation(new TypeBool($value, $json_payload[$value['name']])))->validate();
-          break;
-        case 'date':
-          $this->validated = (new Validation(new TypeDate($value, $json_payload[$value['name']])))->validate();
-          break;
-        case 'array':
-          foreach ($json_payload[$value['name']] as $vv) {
-            $this->recursive_walk($value['schema']['sub'], $vv);
+  private function recursive_walk($value, $input) {
+    $t = null;
+    switch ($value['type']) {
+      case 'ipv4':
+      case 'ipv6':
+      case 'mac':
+      case 'email':
+      case 'date':
+      case 'time':
+      case 'string':
+        $t = new TypeText($input[$value['name']]);
+        $t->setType($value['type']);
+        $this->validated = $t->validate();
+        break;
+      case 'int':
+      case 'float':
+        $t = new TypeNumeric($input[$value['name']]);
+        $t->setType($value['type']);
+        $this->validated = $t->validate();
+        break;
+      case 'boolean':
+        $t = new TypeBool($input[$value['name']]);
+        $this->validated = $t->validate();
+        break;
+      case 'array':
+        $ass = isset($value['assoc']) ? $value['assoc'] : false;
+        if($ass){
+          foreach ($value['schema'] as $sub) {
+            $this->recursive_walk($sub, $input[$value['name']]);
           }
-          break;
-        case 'object':
-          $this->recursive_walk($value['sub'], $json_payload[$value['name']]);
-          break;
-        default:
-          $this->validated = false;
-          return;
-          break;
-      }
+        }else{
+          $s = $value['schema'];
+          for($i = 0; $i < sizeof($input[$value['name']]); $i++){
+            $s['name'] = $i;
+            $this->recursive_walk($s, [$i => $input[$value['name']][$i]]);
+          }
+        }
+        break;
+      default:
+        $this->validated = false;
+        break;
     }
-  }
 
-  public function getErrors() {
-    return $this->error_nodes;
   }
-
 }
