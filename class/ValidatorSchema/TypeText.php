@@ -6,13 +6,28 @@ class TypeText extends SuperType implements ValidationInterface {
 
   private $type = "string";
 
+  private $nullable = false;
+
+  private $empty = false;
+
   public function setType($type){
     $this->type = $type;
   }
 
+  public function setNullable($nullable){
+    $this->nullable = $nullable;
+  }
+
+  public function setEmpty($empty){
+    $this->empty = $empty;
+  }
+
   public function validateType() {
-    if (strval($this->value) !== $this->value) {
-      return false;
+    if($this->nullable && $this->value == null){
+      return true;
+    }
+    if($this->empty && $this->value == ""){
+      return true;
     }
     $f = true;
     switch($this->type){
@@ -43,6 +58,14 @@ class TypeText extends SuperType implements ValidationInterface {
           break;
         }
         $f = ($t->getLastErrors()['error_count'] == 0);
+        break;
+      case "datetime":
+        $d = DateTime::createFromFormat('Y-m-d H:i:s', $this->value);
+        if($d == false){
+          $f = false;
+          break;
+        }
+        $f = ($d->getLastErrors()['error_count'] == 0);
         break;
     }
     return $f;

@@ -8,7 +8,7 @@ class ValidatorSchema {
   public $validated = true;
 
   public function validate($schema, $data) {
-    if (!is_array($schema)) {
+    if (!is_array($schema)){
       $this->validated = false;
       return $this->validated;
     }
@@ -19,6 +19,16 @@ class ValidatorSchema {
   }
 
   private function recursive_walk($value, $input) {
+
+    $rq = (isset($value['required']) ? $value['required'] : false);
+    if(!$rq){
+      return;
+    }
+    if($rq && !array_key_exists($value['name'], $input)){
+      $this->validated = false;
+      return;
+    }
+
     $t = null;
     switch ($value['type']) {
       case 'ipv4':
@@ -27,15 +37,19 @@ class ValidatorSchema {
       case 'email':
       case 'date':
       case 'time':
+      case 'datetime':
       case 'string':
         $t = new TypeText($input[$value['name']]);
         $t->setType($value['type']);
+        $t->setNullable(isset($value['nullable']) ? $value['nullable'] : false);
+        $t->setEmpty(isset($value['empty']) ? $value['empty'] : false);
         $this->validated = $t->validate();
         break;
       case 'int':
       case 'float':
         $t = new TypeNumeric($input[$value['name']]);
         $t->setType($value['type']);
+        $t->setNullable(isset($value['nullable']) ? $value['nullable'] : false);
         $this->validated = $t->validate();
         break;
       case 'boolean':
@@ -60,6 +74,5 @@ class ValidatorSchema {
         $this->validated = false;
         break;
     }
-
   }
 }

@@ -6,11 +6,20 @@ class TypeNumeric extends SuperType implements ValidationInterface {
 
   private $type = "int";
 
+  private $nullable = false;
+
   public function setType($type){
     $this->type = $type;
   }
 
+  public function setNullable($nullable){
+    $this->nullable = $nullable;
+  }
+
   public function validateType() {
+    if($this->nullable && $this->value == null){
+      return true;
+    }
     $f = false;
     switch($this->type){
       case "int":
@@ -22,8 +31,9 @@ class TypeNumeric extends SuperType implements ValidationInterface {
       default:
         return false;
     }
-    if(!$f)
+    if(!$f){
       return false;
+    }
     return true;
   }
 

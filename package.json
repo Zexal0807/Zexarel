@@ -1,12 +1,13 @@
 {
 	"name" : "Zexarel",
-	"version" : "1.3.9",
+	"version" : "1.4.0",
 	"require" : {
 		"function" : {
 			"find" : "find.php",
 			"get_string_between" : "get_string_between.php",
 			"redirect" : "redirect.php",
-			"d_var_dump" : "d_var_dump.php"
+			"d_var_dump" : "d_var_dump.php",
+			"build_query" : "build_query.php"
 		},
 		"class" : {
 			"ZConfig" : {
