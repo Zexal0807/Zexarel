@@ -1,11 +1,20 @@
 <?php
 class ZRoute{
+
 	private static $_route = [];
+
+	private static $_middleware = [];
+
 	public static function __callStatic($name, $arg){
 		if(in_array(strtoupper($name), ["GET", "POST", "PUT", "DELETE", "HEAD"])){
 			ZRoute::$_route[] = new Route(strtoupper($name), $arg[0], $arg[1], (isset($arg[2]) ? $arg[2] : null));
 		}
 	}
+
+	public static function addMiddleware($fx){
+		ZRoute::$_middleware[] = $fx;
+	}
+
 	public static function getUri($name){
 		/*
 		Metodo getUri
@@ -20,14 +29,6 @@ class ZRoute{
 		return "";
 	}
 
-	public static function getRoute($name){
-		foreach(ZRoute::$_route as $r){
-			if($r->getName() == $name){
-				return $r;
-			}
-		}
-	}
-
 	public static function listen(){
 		/*
 		Metodo listen
@@ -36,6 +37,7 @@ class ZRoute{
 		*/
 		$req = new Request();
 		$r = explode("/", $req ->getUrl());
+		/*
 		if(isset($r[0]) && class_exists($r[0]) && get_parent_class($r[0]) == "ZController"){
 			if(isset($r[1]) && method_exists($r[0], $r[1])){
 				$arg = $r;
@@ -52,14 +54,26 @@ class ZRoute{
 				exit;
 			}
 		}
+		*/
 		for($i = 0; $i < sizeof(ZRoute::$_route); $i++){
-			if(ZRoute::$_route[$i]->compareRequestAndRun($req)){
+			if(ZRoute::$_route[$i]->compare($req)){
+				ZRoute::runMiddleware(ZRoute::$_route[$i]);
 				exit();
 			}
 		}
 		http_response_code(404);
 		include(__DIR__ . "/../../error/404.html");
-		exit;
+		exit();
+	}
+
+	private static function runMiddleware(Route $route){
+		$ret = true;
+		for($i = 0; $i < sizeof(ZRoute::$_middleware) && $ret; $i++){
+			$ret = call_user_func_array(ZRoute::$_middleware[$i], [ $route->getData() ]);
+		}
+		if($ret){
+			$route->run();
+		}
 	}
 }
 ?>
