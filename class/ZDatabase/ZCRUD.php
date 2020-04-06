@@ -44,13 +44,8 @@ abstract class ZCRUD implements ConnectionInterface{
         $sql = "INSERT INTO ".$self->table."(";
         $p = [];
         for($i = 0; $i < sizeof($self->schema); $i++){
-          if(isset($data[$self->schema[$i]['name']])){
-            $sql .= $self->schema[$i]['name']. ", ";
-            $p[] = $data[$self->schema[$i]['name']];
-          }elseif(isset($self->schema[$i]['nullable'])){
-            $sql .= $self->schema[$i]['name'].", ";
-            $p[] = null;
-          }
+          $sql .= $self->schema[$i]['name']. ", ";
+          $p[] = $data[$self->schema[$i]['name']];
         }
         if($self->primaryKey['autoincrement'] != true){
           $sql .= ", ".$self->primaryKey['name'];
@@ -83,23 +78,17 @@ abstract class ZCRUD implements ConnectionInterface{
 
       $v = new ValidatorSchema();
 
-      $s = [];
+      $s = $self->schema;
       $s[] = $self->primaryKey;
-      $s[0]['required'] = true;
-      for($i = 0; $i < sizeof($self->schema); $i++){
-        $s[] = $self->schema[$i];
-        $s[$i+1]['required'] = false;
-      }
+      $s[sizeof($s) - 1]['required'] = true;
 
       if($v->validate($s, $data)){
 
         $sql = "UPDATE ".$self->table." SET ";
         $p = [];
         for($i = 0; $i < sizeof($self->schema); $i++){
-          if(isset($data[$self->schema[$i]['name']])){
-            $sql .= $self->schema[$i]['name']." = ?, ";
-            $p[] = $data[$self->schema[$i]['name']];
-          }
+          $sql .= $self->schema[$i]['name']." = ?, ";
+          $p[] = $data[$self->schema[$i]['name']];
         }
         $sql = substr($sql, 0, -2);
         $sql .= " WHERE ".$self->primaryKey['name']." = ?";
