@@ -12,8 +12,40 @@ abstract class ZCRUD implements ConnectionInterface{
 
   private $db;
 
-  public function __construct(){
+  private $insertSchema;
+  private $updateSchema;
+  private $deleteSchema;
+
+  public function __construct($generate = null){
     $this->db = $this->connect();
+    
+    //insert
+    $this->insertSchema = $this->schema;
+    for($i = 0; $i < sizeof($this->insertSchema); $i++){
+      $this->insertSchema[$i]['required'] = isset($this->insertSchema[$i]['nullable']) && $this->insertSchema[$i]['nullable'] ? false : true;
+    }
+    if($this->primaryKey['autoincrement'] != true){
+      $t = $this->primaryKey;
+      $t['required'] = true;
+      $this->insertSchema[] = $t;
+    }
+
+    //update
+    $this->updateSchema = $this->schema;
+    for($i = 0; $i < sizeof($this->updateSchema); $i++){
+      $this->updateSchema[$i]['required'] = isset($this->updateSchema[$i]['nullable']) && $this->updateSchema[$i]['nullable'] ? false : true;
+    }
+    $t = $this->primaryKey;
+    $t['required'] = true;
+    $this->updateSchema[] = $t;
+
+    //delete
+    $this->deleteSchema = [ $this->primaryKey ];
+    $this->deleteSchema[0]['required'] = true;
+
+    if($generate == null){
+      $this->generateZRoute();
+    }
   }
 
   public function generateZRoute(){
@@ -33,23 +65,13 @@ abstract class ZCRUD implements ConnectionInterface{
     ZRoute::post("zcrud/".$this->table."/insert", function($data) use ($self){
 
       $v = new ValidatorSchema();
-
-      $s = $self->schema;
-      if($self->primaryKey['autoincrement'] != true){
-        $s[] = $self->primaryKey;
-      }
-
-      if($v->validate($s, $data)){
+      if($v->validate($self->insertSchema, $data)){
 
         $sql = "INSERT INTO ".$self->table."(";
         $p = [];
-        for($i = 0; $i < sizeof($self->schema); $i++){
-          $sql .= $self->schema[$i]['name']. ", ";
-          $p[] = $data[$self->schema[$i]['name']];
-        }
-        if($self->primaryKey['autoincrement'] != true){
-          $sql .= ", ".$self->primaryKey['name'];
-          $p[] = $data[$self->primaryKey['name']];
+        for($i = 0; $i < sizeof($self->insertSchema); $i++){
+          $sql .= $self->insertSchema[$i]['name']. ", ";
+          $p[] = $data[$self->insertSchema[$i]['name']];
         }
         $sql = substr($sql, 0, -2).") VALUES(?)";
 
@@ -77,18 +99,13 @@ abstract class ZCRUD implements ConnectionInterface{
     ZRoute::post("zcrud/".$this->table."/update", function($data) use ($self){
 
       $v = new ValidatorSchema();
-
-      $s = $self->schema;
-      $s[] = $self->primaryKey;
-      $s[sizeof($s) - 1]['required'] = true;
-
-      if($v->validate($s, $data)){
+      if($v->validate($self->updateSchema, $data)){
 
         $sql = "UPDATE ".$self->table." SET ";
         $p = [];
-        for($i = 0; $i < sizeof($self->schema); $i++){
-          $sql .= $self->schema[$i]['name']." = ?, ";
-          $p[] = $data[$self->schema[$i]['name']];
+        for($i = 0; $i < sizeof($self->updateSchema) - 1; $i++){  
+          $sql .= $self->updateSchema[$i]['name']." = ?, ";
+          $p[] = $data[$self->updateSchema[$i]['name']];
         }
         $sql = substr($sql, 0, -2);
         $sql .= " WHERE ".$self->primaryKey['name']." = ?";
@@ -118,13 +135,7 @@ abstract class ZCRUD implements ConnectionInterface{
     ZRoute::post("zcrud/".$this->table."/delete", function($data) use ($self){
 
       $v = new ValidatorSchema();
-      $s = [];
-      $s[] = $self->primaryKey;
-      for($i = 0; $i < sizeof($s); $i++){
-        $s[$i]['required'] = true;
-      }
-
-      if($v->validate($s, $data)){
+      if($v->validate($self->updateSchema, $data)){
 
         $sql = build_query(
           "DELETE FROM ".$self->table." WHERE ".$self->primaryKey['name']." = ?",
