@@ -1,6 +1,6 @@
 {
 	"name" : "Zexarel",
-	"version" : "1.4.0",
+	"version" : "1.4.1",
 	"require" : {
 		"function" : {
 			"find" : "find.php",
@@ -21,7 +21,8 @@
 				"ZKernel" : "ZKernel.php"
 			},
 			"ZDatabase" : {
-				"ZDatabase" : "ZDatabase.php"
+				"ZDatabase" : "ZDatabase.php",
+				"ZModel": "ZModel.php"
 			},
 			"ZTimeCompare" : {
 				"ZIntervall" : "ZIntervall.php",
