@@ -31,7 +31,7 @@ class TypeNumeric extends SuperType implements ValidationInterface {
       default:
         return false;
     }
-    if(!$f){
+    if($f === false){
       return false;
     }
     return true;
