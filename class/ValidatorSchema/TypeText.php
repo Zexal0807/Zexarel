@@ -2,7 +2,8 @@
 require_once("ValidationInterface.php");
 require_once("SuperType.php");
 
-class TypeText extends SuperType implements ValidationInterface {
+class TypeText extends SuperType implements ValidationInterface
+{
 
   private $type = "string";
 
@@ -10,42 +11,46 @@ class TypeText extends SuperType implements ValidationInterface {
 
   private $empty = false;
 
-  public function setType($type){
+  public function setType($type)
+  {
     $this->type = $type;
   }
 
-  public function setNullable($nullable){
+  public function setNullable($nullable)
+  {
     $this->nullable = $nullable;
   }
 
-  public function setEmpty($empty){
+  public function setEmpty($empty)
+  {
     $this->empty = $empty;
   }
 
-  public function validateType() {
-    if($this->nullable && $this->value == null){
+  public function validateType()
+  {
+    if ($this->nullable && $this->value == null) {
       return true;
     }
-    if($this->empty && $this->value == ""){
+    if ($this->empty && $this->value == "") {
       return true;
     }
     $f = true;
-    switch($this->type){
+    switch ($this->type) {
       case "email":
-        $f = filter_var($this->value, FILTER_VALIDATE_EMAIL);
+        $f = filter_var($this->value, FILTER_VALIDATE_EMAIL) == $this->value;
         break;
       case "ipv4":
-        $f = filter_var($this->value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
+        $f = filter_var($this->value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == $this->value;
         break;
       case "ipv6":
-        $f = filter_var($this->value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
+        $f = filter_var($this->value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == $this->value;
         break;
       case "mac":
-        $f = filter_var($this->value, FILTER_VALIDATE_MAC);
+        $f = filter_var($this->value, FILTER_VALIDATE_MAC) == $this->value;
         break;
       case "date":
         $d = DateTime::createFromFormat('Y-m-d', $this->value);
-        if($d == false){
+        if ($d == false) {
           $f = false;
           break;
         }
@@ -53,7 +58,7 @@ class TypeText extends SuperType implements ValidationInterface {
         break;
       case "time":
         $t = DateTime::createFromFormat('H:i:s', $this->value);
-        if($t == false){
+        if ($t == false) {
           $f = false;
           break;
         }
@@ -61,7 +66,7 @@ class TypeText extends SuperType implements ValidationInterface {
         break;
       case "datetime":
         $d = DateTime::createFromFormat('Y-m-d H:i:s', $this->value);
-        if($d == false){
+        if ($d == false) {
           $f = false;
           break;
         }

@@ -3,33 +3,34 @@ require_once("TypeBool.php");
 require_once("TypeText.php");
 require_once("TypeNumeric.php");
 
-class ValidatorSchema {
+class ValidatorSchema
+{
 
   public $validated = true;
 
-  public function validate($schema, $data) {
-    if (!is_array($schema)){
+  public function validate($schema, $data)
+  {
+    if (!is_array($schema)) {
       $this->validated = false;
-      return $this->validated;
     }
     foreach ($schema as $value) {
-      $this->recursive_walk($value, $data);
+      $valid = $this->recursive_walk($value, $data);
+      d_var_dump($valid);
+      $this->validated = $this->validated && $valid;
     }
-    return $this->validated;
   }
 
-  private function recursive_walk($value, $input) {
+  private function recursive_walk($value, $input)
+  {
 
     $rq = (isset($value['required']) ? $value['required'] : false);
-    if(!$rq){
-      return;
+    if (!$rq) {
+      return false;
     }
-    if($rq && !array_key_exists($value['name'], $input)){
-      $this->validated = false;
-      return;
+    if ($rq && !array_key_exists($value['name'], $input)) {
+      return false;
     }
 
-    $t = null;
     switch ($value['type']) {
       case 'ipv4':
       case 'ipv6':
@@ -43,36 +44,37 @@ class ValidatorSchema {
         $t->setType($value['type']);
         $t->setNullable(isset($value['nullable']) ? $value['nullable'] : false);
         $t->setEmpty(isset($value['empty']) ? $value['empty'] : false);
-        $this->validated = $t->validate();
-        break;
+        $valid = $t->validate();
+        return $valid;
       case 'int':
       case 'float':
         $t = new TypeNumeric($input[$value['name']]);
         $t->setType($value['type']);
         $t->setNullable(isset($value['nullable']) ? $value['nullable'] : false);
-        $this->validated = $t->validate();
-        break;
+        $valid = $t->validate();
+        return $valid;
       case 'boolean':
         $t = new TypeBool($input[$value['name']]);
-        $this->validated = $t->validate();
-        break;
+        $valid = $t->validate();
+        return $valid;
       case 'array':
         $ass = isset($value['assoc']) ? $value['assoc'] : false;
-        if($ass){
+        $valid = true;
+        if ($ass) {
           foreach ($value['schema'] as $sub) {
-            $this->recursive_walk($sub, $input[$value['name']]);
+            $valid = $valid && $this->recursive_walk($sub, $input[$value['name']]);
           }
-        }else{
+        } else {
           $s = $value['schema'];
-          for($i = 0; $i < sizeof($input[$value['name']]); $i++){
+          $t = true;
+          for ($i = 0; $i < sizeof($input[$value['name']]); $i++) {
             $s['name'] = $i;
-            $this->recursive_walk($s, [$i => $input[$value['name']][$i]]);
+            $valid = $valid && $this->recursive_walk($s, [$i => $input[$value['name']][$i]]);
           }
         }
-        break;
+        return $valid;
       default:
-        $this->validated = false;
-        break;
+        return false;
     }
   }
 }
