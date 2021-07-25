@@ -15,7 +15,6 @@ class ValidatorSchema
     }
     foreach ($schema as $value) {
       $valid = $this->recursive_walk($value, $data);
-      d_var_dump($valid);
       $this->validated = $this->validated && $valid;
     }
   }
