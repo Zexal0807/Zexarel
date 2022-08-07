@@ -1,49 +1,50 @@
 export default class ZexalRouter extends HTMLElement {
+	_base = '';
+
 	constructor() {
 		super();
-		if (this.content() == null) {
+
+		if (this.hasAttribute('base')) {
+			this._base = this.getAttribute('base');
+			this.removeAttribute('base');
+		}
+
+		if (this.getContent() == null) {
 			this.innerHTML = this.innerHTML + '<zexal-content></zexal-content>';
 		}
 	}
 
-	content() {
+	getContent() {
 		return this.querySelector('zexal-content');
 	}
 
-	routes() {
+	emptyContent() {
+		this.querySelector('zexal-content').innerHTML = '';
+	}
+
+	getRoutes() {
 		var routes = this.querySelectorAll('zexal-route');
-		return Array.from(routes).map((route) => ({
-			path: route.getAttribute('path'),
-			page: route.getAttribute('page'), // Page
-			title: route.getAttribute('title') // Optional: Document title
+		routes = Array.from(routes);
+		return routes.map((route) => ({
+			path: this._base + route.getAttribute('path'),
+			page: route.getAttribute('page'),
+			title: route.getAttribute('title')
 		}));
 	}
 
 	connectedCallback() {
-		this.updateLinks();
 		this.navigate(window.location.pathname);
 
-		window.addEventListener('popstate', this._handlePopstate);
+		window.addEventListener('popstate', this._handlePopState);
 	}
 
 	disconnectedCallback() {
-		window.removeEventListener('popstate', this._handlePopstate);
+		window.removeEventListener('popstate', this._handlePopState);
 	}
 
-	_handlePopstate = () => {
+	_handlePopState = () => {
 		this.navigate(window.location.pathname);
 	};
-
-	updateLinks() {
-		this.querySelectorAll('a[route]').forEach((link) => {
-			const target = link.getAttribute('route');
-			link.setAttribute('href', target);
-			link.onclick = (e) => {
-				e.preventDefault();
-				this.navigate(target);
-			};
-		});
-	}
 
 	_segmentize(uri) {
 		return uri.replace(/(^\/+|\/+$)/g, '').split('/');
@@ -103,7 +104,7 @@ export default class ZexalRouter extends HTMLElement {
 	}
 
 	navigate(url) {
-		const matchedRoute = this._match(this.routes(), url);
+		const matchedRoute = this._match(this.getRoutes(), url);
 		if (matchedRoute !== null) {
 			this.activeRoute = matchedRoute;
 			window.history.pushState(null, null, url);
@@ -115,28 +116,18 @@ export default class ZexalRouter extends HTMLElement {
 		const { page, title, params = {} } = this.activeRoute;
 
 		if (page) {
-			// Remove all child nodes in contetn element
-			while (this.content().firstChild) {
-				this.content().removeChild(this.content().firstChild);
-			}
+			this.emptyContent();
 
 			const view = document.createElement(page);
 			document.title = title || document.title;
 			for (let key in params) {
-				if (key !== '*') view.setAttribute(key, params[key]);
+				view.setAttribute(key, params[key]);
 			}
-			this.content().appendChild(view);
-
-			// Update the route links once the DOM is updated
-			this.updateLinks();
+			this.getContent().appendChild(view);
 		}
 	}
 
-	go(url) {
-		this.navigate(url);
-	}
-
-	back() {
+	goBack() {
 		window.history.go(-1);
 	}
 }
