@@ -32,6 +32,12 @@ export default class ZexalRouter extends HTMLElement {
 		}));
 	}
 
+	getRealUrl() {
+		let url = window.location.pathname;
+		url = url.substring(this._base.length);
+		return url;
+	}
+
 	connectedCallback() {
 		this.navigate(window.location.pathname);
 
