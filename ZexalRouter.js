@@ -121,7 +121,8 @@ export default class ZexalRouter extends HTMLElement {
 		if (matchedRoute !== null) {
 			this.activeRoute = matchedRoute;
 			if (this._push) {
-			window.history.pushState(null, null, url);
+				window.history.pushState(null, null, url);
+			}
 			this.update();
 		}
 	}
