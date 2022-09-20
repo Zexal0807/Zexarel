@@ -12,7 +12,7 @@ export default class ZexalRouter extends HTMLElement {
 		}
 
 		if (this.hasAttribute("push")) {
-			this._push = this.getAttribute("push") == "false";
+			this._push = this.getAttribute("push") == "true";
 			this.removeAttribute("push");
 		}
 
