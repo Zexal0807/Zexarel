@@ -41,16 +41,16 @@ export default class ZexalRouter extends HTMLElement {
 	connectedCallback() {
 		this.navigate(window.location.pathname);
 
-		window.addEventListener('popstate', this._handlePopState);
+		//	window.addEventListener("popstate", this._handlePopState);
 	}
 
 	disconnectedCallback() {
-		window.removeEventListener('popstate', this._handlePopState);
+		//	window.removeEventListener("popstate", this._handlePopState);
 	}
 
-	_handlePopState = () => {
-		this.navigate(window.location.pathname);
-	};
+	// _handlePopState = () => {
+	// 	this.navigate(window.location.pathname);
+	// };
 
 	_segmentize(uri) {
 		return uri.replace(/(^\/+|\/+$)/g, '').split('/');
