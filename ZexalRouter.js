@@ -1,12 +1,19 @@
 export default class ZexalRouter extends HTMLElement {
-	_base = '';
+	_base = "";
+
+	_push = true;
 
 	constructor() {
 		super();
 
-		if (this.hasAttribute('base')) {
-			this._base = this.getAttribute('base');
-			this.removeAttribute('base');
+		if (this.hasAttribute("base")) {
+			this._base = this.getAttribute("base");
+			this.removeAttribute("base");
+		}
+
+		if (this.hasAttribute("push")) {
+			this._push = this.getAttribute("push") == "false";
+			this.removeAttribute("push");
 		}
 
 		if (this.getContent() == null) {
@@ -113,6 +120,7 @@ export default class ZexalRouter extends HTMLElement {
 		const matchedRoute = this._match(this.getRoutes(), url);
 		if (matchedRoute !== null) {
 			this.activeRoute = matchedRoute;
+			if (this._push) {
 			window.history.pushState(null, null, url);
 			this.update();
 		}
