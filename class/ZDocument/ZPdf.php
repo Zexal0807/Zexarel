@@ -4,7 +4,8 @@
 	Questa classe è molto utile in progetti seri, per qusto si trova quì, in progetti scolastici non dovrebbe venir mai usata
 */
 
-class ZPdf{
+class ZPdf
+{
 
 	protected $page;               // current page number
 	protected $n;                  // current object number
@@ -168,7 +169,71 @@ class ZPdf{
 		$this->PDFVersion = '1.3';
 	}
 
-	public function setMargins($left, $top, $right = null){
+	function tableHeader($header, $options = [])
+	{
+		// Colors, line width and bold font
+		$this->setDrawColor(0, 0, 0);
+		$this->setLineWidth(0.3);
+		$this->setFont('', 'B');
+
+		$h = [];
+		if (isset($options['header'])) {
+			$h["color"]  = isset($options['header']['color']) ? $options['header']['color'] : [0, 0, 0];
+			$h["fill"]  = isset($options['header']['fill']) ? $options['header']['fill'] : [255, 0, 0];
+		}
+
+		$this->setFillColor(...$h['fill']);
+		$this->setTextColor(...$h['color']);
+
+		$w = $options['widths'];
+		for ($i = 0; $i < count($header); $i++) {
+			$width = isset($w[$i]) ? $w[$i] : 50;
+			$this->Cell($width, 7, $header[$i], 1, 0, 'C', true);
+		}
+
+		$this->Ln();
+	}
+
+	function tableContent($data, $options = [])
+	{
+		// Colors, line width and bold font
+		$c = [];
+		if (isset($options['content'])) {
+			$c["color"]  = isset($options['content']['color']) ? $options['content']['color'] : [0, 0, 0];
+			$c["fill"]  = isset($options['content']['fill']) ? $options['content']['fill'] : [255, 0, 0];
+			$c["aligns"]  = isset($options['content']['aligns']) ? $options['content']['aligns'] : "L";
+		}
+		$this->setFillColor(...$c['fill']);
+		$this->setTextColor(...$c['color']);
+		$this->setFont('');
+
+		$w = $options['widths'];
+		$a = $c['aligns'];
+
+		$s = isset($options['stripped']) ? $options['stripped'] : false;
+
+		$fill = false;
+		for ($j = 0; $j < count($data); $j++) {
+			$row = $data[$j];
+			for ($i = 0; $i < count($row); $i++) {
+				$width = isset($w[$i]) ? $w[$i] : 50;
+				$align = isset($a[$i]) ? $a[$i] : "L";
+				$b = $j == count($data) - 1 ? 'LRB' : 'LR';
+				$this->Cell($width, 6, $row[$i], $b, 0, $align, $fill);
+			}
+			$this->Ln();
+			if ($s) {
+				$fill = !$fill;
+			}
+		}
+	}
+
+	function table($header, $data, $options = [])
+	{
+		$this->tableHeader($header, $options);
+		$this->tableContent($data, $options);
+	}
+
 		// Set left, top and right margins
 		$this->setLeftMargin($left);
 		$this->setTopMargin($top);
