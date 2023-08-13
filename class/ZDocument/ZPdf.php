@@ -177,16 +177,19 @@ class ZPdf
 		$this->setLineWidth(0.3);
 		$this->setFont('', 'B');
 
-		$h = [];
+		$h = [
+			"fill" => [255, 0, 0],
+			"color" => [0, 0, 0]
+		];
 		if (isset($options['header'])) {
-			$h["color"]  = isset($options['header']['color']) ? $options['header']['color'] : [0, 0, 0];
-			$h["fill"]  = isset($options['header']['fill']) ? $options['header']['fill'] : [255, 0, 0];
+			$h["color"]  = isset($options['header']['color']) ? $options['header']['color'] :  $h["fill"];
+			$h["fill"]  = isset($options['header']['fill']) ? $options['header']['fill'] : $h["fill"];
 		}
 
 		$this->setFillColor(...$h['fill']);
 		$this->setTextColor(...$h['color']);
 
-		$w = $options['widths'];
+		$w = isset($options['widths']) ? $options['widths'] : 50;
 		for ($i = 0; $i < count($header); $i++) {
 			$width = isset($w[$i]) ? $w[$i] : 50;
 			$this->Cell($width, 7, $header[$i], 1, 0, 'C', true);
@@ -198,7 +201,11 @@ class ZPdf
 	function tableContent($data, $options = [])
 	{
 		// Colors, line width and bold font
-		$c = [];
+		$c = [
+			"fill" => [255, 0, 0],
+			"color" => [0, 0, 0],
+			"aligns" => "L"
+		];
 		if (isset($options['content'])) {
 			$c["color"]  = isset($options['content']['color']) ? $options['content']['color'] : [0, 0, 0];
 			$c["fill"]  = isset($options['content']['fill']) ? $options['content']['fill'] : [255, 0, 0];
@@ -208,7 +215,7 @@ class ZPdf
 		$this->setTextColor(...$c['color']);
 		$this->setFont('');
 
-		$w = $options['widths'];
+		$w = isset($options['widths']) ? $options['widths'] : 50;
 		$a = $c['aligns'];
 
 		$s = isset($options['stripped']) ? $options['stripped'] : false;
