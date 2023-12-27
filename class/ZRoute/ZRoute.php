@@ -62,6 +62,7 @@ class ZRoute{
 			}
 		}
 		http_response_code(404);
+		echo "404: Not found";
 		// include(__DIR__ . "/../../error/404.html");
 		exit();
 	}
