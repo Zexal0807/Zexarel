@@ -47,10 +47,10 @@ class Route{
 					$r = explode("/", $req->getUrl());
 					for($i = 0, $k = 0; $i < sizeof($r); $i++, $k++){
 						if($r[$i] != $f[$k]){
-							if(preg_match('/\[+[a-zA-Z0-9]*+\]/', $f[$k])){
+							if(preg_match('/\[+[a-zA-Z0-9\-]*+\]/', $f[$k])){
 								$arr[str_replace(["[", "]"], "", $f[$k])] = ($r[$i] == $f[$k]);
 								$i--;
-							}elseif(preg_match('/\<+[a-zA-Z0-9]*+\>/', $f[$k])){
+							}elseif(preg_match('/\<+[a-zA-Z0-9\-]*+\>/', $f[$k])){
 								$arr[str_replace(["<", ">"], "", $f[$k])] = $r[$i];
 							}
 						}
