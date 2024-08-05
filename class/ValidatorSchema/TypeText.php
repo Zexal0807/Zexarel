@@ -54,7 +54,8 @@ class TypeText extends SuperType implements ValidationInterface
           $f = false;
           break;
         }
-        $f = ($d->getLastErrors()['error_count'] == 0);
+        $errors = $d->getLastErrors();
+        $f = $errors == false ? true : $errors['error_count'] == 0;
         break;
       case "time":
         $t = DateTime::createFromFormat('H:i:s', $this->value);
@@ -62,7 +63,8 @@ class TypeText extends SuperType implements ValidationInterface
           $f = false;
           break;
         }
-        $f = ($t->getLastErrors()['error_count'] == 0);
+        $errors = $t->getLastErrors();
+        $f = $errors == false ? true : $errors['error_count'] == 0;
         break;
       case "datetime":
         $d = DateTime::createFromFormat('Y-m-d H:i:s', $this->value);
@@ -70,7 +72,8 @@ class TypeText extends SuperType implements ValidationInterface
           $f = false;
           break;
         }
-        $f = ($d->getLastErrors()['error_count'] == 0);
+        $errors = $d->getLastErrors();
+        $f = $errors == false ? true : $errors['error_count'] == 0;
         break;
     }
     return $f;
