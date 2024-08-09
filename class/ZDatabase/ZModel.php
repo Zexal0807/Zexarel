@@ -1,185 +1,163 @@
 <?php
 require_once __DIR__ . "/../ValidatorSchema/ValidatorSchema.php";
 
-abstract class ZModel implements ConnectionInterface{
+abstract class ZModel {
 
-  protected $table;
+  const CREATION_MODE_FROM_DATABASE = 1;
+  const CREATION_MODE_FROM_CODE = 2;
 
-  protected $schema = [];
-  protected $primaryKey = [];
+  protected static $tablename;
 
-  protected $availableMode = ["c", "u", "d"];
+  protected static $tableid = "id";
 
-  private $db;
+  private static $DB;
 
-  private $insertSchema;
-  private $updateSchema;
-  private $deleteSchema;
-
-  public function __construct(){
-    $this->db = $this->connect();
-
-    //insert
-    $this->insertSchema = $this->schema;
-    for($i = 0; $i < sizeof($this->insertSchema); $i++){
-      $this->insertSchema[$i]['required'] = isset($this->insertSchema[$i]['nullable']) && $this->insertSchema[$i]['nullable'] ? false : true;
-    }
-    if($this->primaryKey['autoincrement'] != true){
-      $t = $this->primaryKey;
-      $t['required'] = true;
-      $this->insertSchema[] = $t;
-    }
-
-    //update
-    $this->updateSchema = $this->schema;
-    for($i = 0; $i < sizeof($this->updateSchema); $i++){
-      $this->updateSchema[$i]['required'] = isset($this->updateSchema[$i]['nullable']) && $this->updateSchema[$i]['nullable'] ? false : true;
-    }
-    $t = $this->primaryKey;
-    $t['required'] = true;
-    $this->updateSchema[] = $t;
-
-    //delete
-    $this->deleteSchema = [ $this->primaryKey ];
-    $this->deleteSchema[0]['required'] = true;
+  public static function setDB($DB){
+    self::$DB = $DB;
   }
 
-  public function generateZRoute(){
-    if(in_array("c", $this->availableMode)){
-      $this->genInsert();
+  protected $fields = [];
+  private $data = [];
+
+  private $mode = ZModel::CREATION_MODE_FROM_CODE;
+
+  public function __construct($data = []) {
+    foreach ($this->fields as $field) {
+      $this->data[$field] = NULL;
     }
-    if(in_array("u", $this->availableMode)){
-      $this->genUpdate();
-    }
-    if(in_array("d", $this->availableMode)){
-      $this->genDelete();
+
+    foreach ($data as $key => $value) {
+      $this->data[$key] = $value;
     }
   }
 
-  public function insert($data){
-    $v = new ValidatorSchema();
-    if($v->validate($this->insertSchema, $data)){
+  public function __set($name, $value) {
+      $this->data[$name] = $value;
+  }
 
-      $sql = "INSERT INTO ".$this->table."(";
-      $p = [];
-      for($i = 0; $i < sizeof($this->insertSchema); $i++){
-        $sql .= $this->insertSchema[$i]['name']. ", ";
-        $p[] = $data[$this->insertSchema[$i]['name']];
-      }
-      $sql = substr($sql, 0, -2).") VALUES(?)";
-
-      $sql = build_query($sql, [$p]);
-
-      $this->db->query($sql);
-
-      $ret = [
-        "fieldCount" => $this->db->field_count,
-        "affectedRows" => $this->db->affected_rows,
-        "insertId" => $this->db->insert_id,
-        "warningCount" => $this->db->warning_count
-      ];
-      return $ret;
-    }else{
-      return false;
+  public function __get($name) {
+    if (array_key_exists($name, $this->data)) {
+      return $this->data[$name];
     }
+    return null;
   }
 
-  private function genInsert(){
-    $self = $this;
-    ZRoute::post("zcrud/".$this->table."/insert", function($data) use ($self){
-      $r = $self->insert($data);
-      if($r != false){
-        header('Content-Type: application/json');
-        echo json_encode($r);
-      }else{
-        header("HTTP/1.0 402 Not Valid");
-      }
-    });
-  }
-
-  public function update($data){
-    $v = new ValidatorSchema();
-    if($v->validate($this->updateSchema, $data)){
-
-      $sql = "UPDATE ".$this->table." SET ";
-      $p = [];
-      for($i = 0; $i < sizeof($this->updateSchema) - 1; $i++){
-        $sql .= $this->updateSchema[$i]['name']." = ?, ";
-        $p[] = $data[$this->updateSchema[$i]['name']];
-      }
-      $sql = substr($sql, 0, -2);
-      $sql .= " WHERE ".$this->primaryKey['name']." = ?";
-      $p[] = $data[$this->primaryKey['name']];
-
-      $sql = build_query($sql, $p);
-
-      $this->db->query($sql);
-
-      $ret = [
-        "fieldCount" => $this->db->field_count,
-        "affectedRows" => $this->db->affected_rows,
-        "insertId" => $this->db->insert_id,
-        "warningCount" => $this->db->warning_count
-      ];
-
-      return $ret;
-    }else{
-      return false;
+  public function save() {
+    if ($this->mode == ZModel::CREATION_MODE_FROM_CODE) {
+        $this->insert();
+    } else {
+      $this->update();
     }
+    return $this;
   }
 
-  private function genUpdate(){
-    $self = $this;
-    ZRoute::post("zcrud/".$this->table."/update", function($data) use ($self){
-      $r = $self->update($data);
-      if($r != false){
-        header('Content-Type: application/json');
-        echo json_encode($r);
-      }else{
-        header("HTTP/1.0 402 Not Valid");
-      }
-    });
-  }
+  protected function preInsert(){}
+  protected function postInsert($status, $insert_id){}
 
-  public function delete($data){
-    $v = new ValidatorSchema();
-    if($v->validate($this->updateSchema, $data)){
+  private function insert() {
+    $this->preInsert($this);
 
-      $sql = build_query(
-        "DELETE FROM ".$this->table." WHERE ".$this->primaryKey['name']." = ?",
-        [ $data[$this->primaryKey['name']] ]
-      );
-
-      $this->db->query($sql);
-
-      $ret = [
-        "fieldCount" => $this->db->field_count,
-        "affectedRows" => $this->db->affected_rows,
-        "insertId" => $this->db->insert_id,
-        "warningCount" => $this->db->warning_count
-      ];
-
-      return $ret;
-    }else{
-      return false;
+    $fields = [];
+    $values = [];
+    $subquery = [];
+    foreach($this->data as $k => $v){
+      $fields[] = $k;
+      $values[] = $v;
+      $subquery[] = "?";
     }
-  }
 
-  private function genDelete(){
-    $self = $this;
-    ZRoute::post("zcrud/".$this->table."/delete", function($data) use ($self){
-      $r = $self->delete($data);
-      if($r != false){
-        header('Content-Type: application/json');
-        echo json_encode($r);
-      }else{
-        header("HTTP/1.0 402 Not Valid");
-      }
-    });
-  }
+    $sql = <<< SQLEND
+    INSERT INTO %s (%s) 
+    VALUES (%s)
+    SQLEND;
 
+    $sql = sprintf($sql, static::$tablename, implode(", ", $fields), implode(", ", $subquery));
+    var_dump($sql);
+
+		$query = self::$DB->prepare($sql);
+
+		$f = str_repeat("s", sizeof($values));
+    $query->bind_param($f, ...$values);
+		$query->execute();
+
+    $status = $query->affected_rows == 1;
+    $insert_id = $query->insert_id;
+
+    $this->postInsert($status, $insert_id);
+    return $insert_id;
 }
 
-interface ConnectionInterface {
-  public function connect();
+  protected function preUpdate(){}
+  protected function postUpdate($status){}
+
+  private function update() {
+    $this->preUpdate();
+
+    $subquery = [];
+    $values = [];
+    
+    foreach($this->data as $k => $v){
+      if($k != static::$tableid) {
+        $s = '%s = ?';
+        $subquery[] = sprintf($s, $k);
+        $values[] = $v;
+      }
+    }
+    $subquery = implode(', ', $subquery);
+
+    $sql = <<< SQLEND
+    UPDATE %s
+    SET $subquery
+    WHERE %s = ?
+    SQLEND;
+
+    $sql = sprintf($sql, static::$tablename, static::$tableid);
+		$query = self::$DB->prepare($sql);
+
+		$f = str_repeat("s", sizeof($values) + 1);
+    $values[] =$this->id;
+    $query->bind_param($f, ...$values);
+		$query->execute();
+
+    $status = $query->affected_rows == 1;
+    
+    $this->postUpdate($status);
+    return $status;
+  }
+
+  public static function findById($id){
+    $sql = <<< SQLEND
+    SELECT *
+    FROM %s
+    WHERE %s = ?
+    SQLEND;
+
+    $sql = sprintf($sql, static::$tablename, static::$tableid);
+
+		$query = self::$DB->prepare($sql);
+
+		$query->bind_param("s", $id);
+		$query->execute();
+		$query = $query->get_result();
+		$data = $query->fetch_assoc();
+    return static::toModel($data);
+  }
+
+  public static function toModel($data){
+    $model = new static($data);
+    $model->mode = ZModel::CREATION_MODE_FROM_DATABASE;
+
+		return $model;
+  }
+
+  public static function arrayToModel($dataArray){
+    $d = [];
+    foreach($dataArray as $data){
+      $model = new static($data); 
+      $model->mode = ZModel::CREATION_MODE_FROM_DATABASE;
+      $d[] = $model;
+    }
+		return $d;
+  }
+
 }
