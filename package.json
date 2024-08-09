@@ -1,46 +1,48 @@
 {
-	"name" : "Zexarel",
-	"version" : "1.4.1",
-	"require" : {
-		"function" : {
-			"find" : "find.php",
-			"get_string_between" : "get_string_between.php",
-			"redirect" : "redirect.php",
-			"d_var_dump" : "d_var_dump.php",
-			"build_query" : "build_query.php"
+	"name": "Zexarel",
+	"version": "1.4.1",
+	"require": {
+		"function": {
+			"find": "find.php",
+			"get_string_between": "get_string_between.php",
+			"redirect": "redirect.php",
+			"d_var_dump": "d_var_dump.php",
+			"build_query": "build_query.php"
 		},
-		"class" : {
-			"ZConfig" : {
-				"ZConfig" : "ZConfig.php"
+		"class": {
+			"ZConfig": {
+				"ZConfig": "ZConfig.php"
 			},
-			"ZLogger" : {
-				"Log" : "Log.php",
-				"ZLogger" : "ZLogger.php"
+			"ZLogger": {
+				"Log": "Log.php",
+				"ZLogger": "ZLogger.php"
 			},
-			"ZKernel" : {
-				"ZKernel" : "ZKernel.php"
+			"ZKernel": {
+				"ZKernel": "ZKernel.php"
 			},
-			"ZDatabase" : {
-				"ZDatabase" : "ZDatabase.php",
-				"ZModel": "ZModel.php"
+			"ZDatabase": {
+				"ZDatabase": "ZDatabase.php"
 			},
-			"ZTimeCompare" : {
-				"ZIntervall" : "ZIntervall.php",
-				"ZTimeComparator" : "ZTimeComparator.php"
+			"ZTimeCompare": {
+				"ZIntervall": "ZIntervall.php",
+				"ZTimeComparator": "ZTimeComparator.php"
 			},
-			"ZController" : {
-				"ZController" : "ZController.php"
+			"ZController": {
+				"ZController": "ZController.php"
 			},
-			"ZRoute" : {
-				"Request" : "Request.php",
-				"RoutePatternCreator" : "RoutePatternCreator.php",
-				"Route" : "Route.php",
-				"ZRoute" : "ZRoute.php"
+			"ZRoute": {
+				"Request": "Request.php",
+				"RoutePatternCreator": "RoutePatternCreator.php",
+				"Route": "Route.php",
+				"ZRoute": "ZRoute.php"
 			},
-			"ZView" : {
-				"ZBladeCompiler" : "ZBladeCompiler.php",
-				"ZView" : "ZView.php",
-				"ZModel" : "ZHtmlModel.php"
+			"ValidatorSchema": {
+				"ValidatorSchema": "ValidatorSchema.php"
+			},
+			"ZView": {
+				"ZBladeCompiler": "ZBladeCompiler.php",
+				"ZView": "ZView.php",
+				"ZModel": "ZHtmlModel.php"
 			}
 		}
 	}
