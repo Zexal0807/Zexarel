@@ -170,6 +170,31 @@ class ZPdf
 		$this->PDFVersion = '1.3';
 	}
 
+	public static function sptostr($word) {
+		$search = [
+			"@", "€", "`", "¢", "£", "¥", "|", "«", "¬", "¯", "º", "±", "ª", "µ", "»", "¼", "½", "¿",
+			"À", "Á", "Â", "Ã", "Ä", "Å", "Æ", "Ç", "È", "É", "Ê", "Ë", "Ì", "Í", "Î", "Ï", "Ð", "Ñ",
+			"Ò", "Ó", "Ô", "Õ", "Ö", "Ø", "Ù", "Ú", "Û", "Ü", "Ý", "Þ", "ß", "à", "á", "â", "ã", "ä",
+			"å", "æ", "ç", "è", "é", "ê", "ë", "ì", "í", "î", "ï", "ð", "ñ", "ò", "ó", "ô", "õ", "ö",
+			"÷", "ø", "ù", "ú", "û", "ü", "ý", "þ", "ÿ"
+		];
+
+		$replace = [
+			"%40", "%80", "%60", "%A2", "%A3", "%A5", "%A6", "%AB", "%AC", "%AD", "%B0", "%B1", "%B2", 
+			"%B5", "%BB", "%BC", "%BD", "%BF", "%C0", "%C1", "%C2", "%C3", "%C4", "%C5", "%C6", "%C7", 
+			"%C8", "%C9", "%CA", "%CB", "%CC", "%CD", "%CE", "%CF", "%D0", "%D1", "%D2", "%D3", "%D4", 
+			"%D5", "%D6", "%D8", "%D9", "%DA", "%DB", "%DC", "%DD", "%DE", "%DF", "%E0", "%E1", "%E2", 
+			"%E3", "%E4", "%E5", "%E6", "%E7", "%E8", "%E9", "%EA", "%EB", "%EC", "%ED", "%EE", "%EF", 
+			"%F0", "%F1", "%F2", "%F3", "%F4", "%F5", "%F6", "%F7", "%F8", "%F9", "%FA", "%FB", "%FC", 
+			"%FD", "%FE", "%FF"
+		];
+
+		// Sostituisci tutti i caratteri in una volta
+		$word = str_replace($search, $replace, $word);
+
+		return urldecode($word);
+	}
+
 	function tableHeader($header, $options = [])
 	{
 		// Colors, line width and bold font
@@ -192,7 +217,7 @@ class ZPdf
 		$w = isset($options['widths']) ? $options['widths'] : 50;
 		for ($i = 0; $i < count($header); $i++) {
 			$width = isset($w[$i]) ? $w[$i] : 50;
-			$this->Cell($width, 7, $header[$i], 1, 0, 'C', true);
+			$this->Cell($width, 7, ZPdf::sptostr($header[$i]), 1, 0, 'C', true);
 		}
 
 		$this->Ln();
@@ -227,7 +252,7 @@ class ZPdf
 				$width = isset($w[$i]) ? $w[$i] : 50;
 				$align = isset($a[$i]) ? $a[$i] : "L";
 				$b = $j == count($data) - 1 ? 'LRB' : 'LR';
-				$this->Cell($width, 6, $row[$i], $b, 0, $align, $fill);
+				$this->Cell($width, 6, ZPdf::sptostr($row[$i]), $b, 0, $align, $fill);
 			}
 			$this->Ln();
 			if ($s) {
