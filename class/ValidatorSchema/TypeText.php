@@ -28,12 +28,12 @@ class TypeText extends SuperType implements ValidationInterface
 
   public function validateType()
   {
-    if ($this->nullable && $this->value == null) {
+    if ($this->nullable && $this->value == null)
       return true;
-    }
-    if ($this->empty && $this->value == "") {
+    if ($this->empty && $this->value == "")
       return true;
-    }
+    if (!$this->empty && $this->value == "")
+      return false;
     $f = true;
     switch ($this->type) {
       case "email":
