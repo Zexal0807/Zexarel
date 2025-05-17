@@ -1,19 +1,12 @@
 export default class ZexalRouter extends HTMLElement {
 	_base = "";
 
-	_push = true;
-
 	constructor() {
 		super();
 
 		if (this.hasAttribute("base")) {
 			this._base = this.getAttribute("base");
 			this.removeAttribute("base");
-		}
-
-		if (this.hasAttribute("push")) {
-			this._push = this.getAttribute("push") == "true";
-			this.removeAttribute("push");
 		}
 
 		if (this.getContent() == null) {
@@ -47,17 +40,16 @@ export default class ZexalRouter extends HTMLElement {
 
 	connectedCallback() {
 		this.navigate(window.location.pathname);
-
-		//	window.addEventListener("popstate", this._handlePopState);
+		window.addEventListener("popstate", this._handlePopState);
 	}
 
 	disconnectedCallback() {
-		//	window.removeEventListener("popstate", this._handlePopState);
+		window.removeEventListener("popstate", this._handlePopState);
 	}
 
-	// _handlePopState = () => {
-	// 	this.navigate(window.location.pathname);
-	// };
+	_handlePopState = () => {
+		this.navigate(window.location.pathname);
+	};
 
 	_segmentize(uri) {
 		return uri.replace(/(^\/+|\/+$)/g, '').split('/');
@@ -117,14 +109,26 @@ export default class ZexalRouter extends HTMLElement {
 	}
 
 	navigate(url) {
+		const fullUrl = this._normalizeUrl(url);
 		const matchedRoute = this._match(this.getRoutes(), url);
+
 		if (matchedRoute !== null) {
 			this.activeRoute = matchedRoute;
-			if (this._push) {
-				window.history.pushState(null, null, url);
-			}
+			window.history.pushState(null, null, url);
 			this.update();
 		}
+	}
+
+	_normalizeUrl(url) {
+		// Se l'URL è assoluto, lo lasciamo com'è
+		if (url.startsWith('/')) 
+			return this._base + url.replace(/^\//, '');
+
+		// Se è relativo, lo combiniamo
+		const current = window.location.pathname.replace(this._base, '');
+		const newPath = new URL(url, window.location.origin + this._base + current).pathname;
+
+		return newPath;
 	}
 
 	update() {
@@ -152,3 +156,35 @@ customElements.define('zexal-router', ZexalRouter);
 class ZexalRoute extends HTMLElement {}
 
 customElements.define('zexal-route', ZexalRoute);
+
+
+class ZexalLink extends HTMLElement {
+
+	connectedCallback() {
+		this.style.cursor = 'pointer';
+		const to = this.getAttribute('href') || '/';
+
+		this.addEventListener('click', (e) => {
+			e.preventDefault();
+
+			const router = this.closest('zexal-router');
+			if (router && typeof router.navigate === 'function') {
+				const base = router._base || '';
+				const fullUrl = new URL(to, window.location.origin + base + "/").pathname;
+				router.navigate(fullUrl);
+			} else {
+				// Se non esiste il router uso un classico history.pushState
+				history.pushState({}, '', to);
+			}
+		});
+
+		this.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				this.click();
+			}
+		});
+	}
+}
+
+customElements.define('zexal-link', ZexalLink);
