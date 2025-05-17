@@ -109,7 +109,6 @@ export default class ZexalRouter extends HTMLElement {
 	}
 
 	navigate(url) {
-		const fullUrl = this._normalizeUrl(url);
 		const matchedRoute = this._match(this.getRoutes(), url);
 
 		if (matchedRoute !== null) {
@@ -157,7 +156,6 @@ class ZexalRoute extends HTMLElement {}
 
 customElements.define('zexal-route', ZexalRoute);
 
-
 class ZexalLink extends HTMLElement {
 
 	connectedCallback() {
@@ -167,7 +165,7 @@ class ZexalLink extends HTMLElement {
 		this.addEventListener('click', (e) => {
 			e.preventDefault();
 
-			const router = this.closest('zexal-router');
+			const router = document.querySelector('zexal-router');
 			if (router && typeof router.navigate === 'function') {
 				const base = router._base || '';
 				const fullUrl = new URL(to, window.location.origin + base + "/").pathname;
