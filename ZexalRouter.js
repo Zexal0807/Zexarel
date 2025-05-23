@@ -1,8 +1,12 @@
 export default class ZexalRouter extends HTMLElement {
 	_base = "";
+	
+	_historyStack;
 
 	constructor() {
 		super();
+
+		this._historyStack = [];
 
 		if (this.hasAttribute("base")) {
 			this._base = this.getAttribute("base");
@@ -48,7 +52,13 @@ export default class ZexalRouter extends HTMLElement {
 	}
 
 	_handlePopState = () => {
-		this.navigate(window.location.pathname);
+		let targetUrl = this._historyStack.pop()
+		targetUrl = this._historyStack.pop()
+
+		if(targetUrl == undefined)
+			this.navigate(this._base + "/");
+
+		this.navigate(targetUrl);
 	};
 
 	_segmentize(uri) {
@@ -107,13 +117,14 @@ export default class ZexalRouter extends HTMLElement {
 
 		return match || null;
 	}
-
+	
 	navigate(url) {
 		const matchedRoute = this._match(this.getRoutes(), url);
 
 		if (matchedRoute !== null) {
 			this.activeRoute = matchedRoute;
-			window.history.pushState(null, null, url);
+			window.history.replaceState(null, null, url);
+			this._historyStack.push(url);
 			this.update();
 		}
 	}
@@ -146,7 +157,7 @@ export default class ZexalRouter extends HTMLElement {
 	}
 
 	goBack() {
-		window.history.go(-1);
+		this._handlePopState();
 	}
 }
 
