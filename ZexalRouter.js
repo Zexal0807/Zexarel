@@ -173,9 +173,20 @@ class ZexalLink extends HTMLElement {
 		this.style.cursor = 'pointer';
 		const to = this.getAttribute('href') || '/';
 
-		this.addEventListener('click', (e) => {
+		const openInNewTab = (e) => {
 			e.preventDefault();
 
+			if(e.button == 1){
+				let a = document.createElement("a");
+				a.href = to;
+				a.target = "_blank";
+				a.click();
+			}
+		}
+
+		const openHere = (e) => {
+			e.preventDefault();
+			
 			const router = document.querySelector('zexal-router');
 			if (router && typeof router.navigate === 'function') {
 				const base = router._base || '';
@@ -184,6 +195,16 @@ class ZexalLink extends HTMLElement {
 			} else {
 				// Se non esiste il router uso un classico history.pushState
 				history.pushState({}, '', to);
+			}
+		}
+
+		this.addEventListener('auxclick', openInNewTab);
+
+		this.addEventListener('click', (e) => {
+			if(e.ctrlKey){
+				openInNewTab(e);
+			}else{
+				openHere(e);
 			}
 		});
 
